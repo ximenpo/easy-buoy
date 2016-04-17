@@ -39,6 +39,9 @@
     <ClInclude Include="windesk-buoy.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="funcs.h">
+      <Filter>logic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -47,7 +50,13 @@
     <ClCompile Include="windesk-buoy.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="main_procedure.cpp">
+    <ClCompile Include="external-libs.cpp">
+      <Filter>logic</Filter>
+    </ClCompile>
+    <ClCompile Include="win-utils.cpp">
+      <Filter>logic</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
       <Filter>logic</Filter>
     </ClCompile>
   </ItemGroup>
