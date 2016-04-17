@@ -30,7 +30,9 @@
 *.sdf
 *.user
 *.suo
+*.aps
 
 Debug
 Release
 ipch
+x64
