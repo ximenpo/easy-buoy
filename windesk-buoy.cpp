@@ -25,7 +25,15 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
- 	// TODO: 在此放置代码。
+ 	// locust: 根据系统启动对应的程序
+	{
+		extern	bool	is_64bits_windows();
+		if(is_64bits_windows()){
+			MessageBox(NULL, "", "64BIT", MB_OK);
+			return	0;
+		}
+	}
+
 	MSG msg;
 	HACCEL hAccelTable;
 

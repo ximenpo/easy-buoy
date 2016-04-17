@@ -3,6 +3,27 @@
 #include	<CommCtrl.h>
 
 //
+//	判断是否64位系统
+//
+bool	is_64bits_windows(){
+	typedef VOID (WINAPI *LPFN_GetNativeSystemInfo)(LPSYSTEM_INFO lpSystemInfo);
+
+	SYSTEM_INFO si;
+	LPFN_GetNativeSystemInfo fnGetNativeSystemInfo = (LPFN_GetNativeSystemInfo)GetProcAddress( GetModuleHandle(_T("kernel32")), "GetNativeSystemInfo");;
+	if (NULL != fnGetNativeSystemInfo){
+		fnGetNativeSystemInfo(&si);
+	}else{
+		GetSystemInfo(&si);
+	}
+	if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64 ||
+		si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_IA64 ){
+			return true;
+	}
+
+	return false;
+}
+
+//
 //	根据类名获取子窗口（第一个），亦可用 FindWindowEx 代替
 //
 HWND	find_child_by_class(HWND hWnd, const char* sClass){
@@ -58,7 +79,7 @@ bool	get_desktop_icon_RECT(const char* psCaption, RECT* pRect){
 			return	false;
 		}
 	}
-	
+
 	LVITEM	xItem,	*pRemoteItem		= NULL;
 	char	sText[512],	*pRemoteText	= NULL;
 
