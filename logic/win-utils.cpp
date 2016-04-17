@@ -118,3 +118,32 @@ bool	get_desktop_icon_RECT(const char* psCaption, RECT* pRect){
 
 	return	bFound;
 }
+
+//
+//	获取资源内容
+//
+bool	fetch_resource_data(
+    HMODULE		hModule,
+    const char*	res_name,
+    const char*	res_type,
+	void*&		res_data,
+	size_t&		res_size
+	)
+{
+	HRSRC hRsrc		= FindResourceA(hModule, res_name, res_type);
+	if(NULL == hRsrc)	return false;
+
+	DWORD dwSize	= SizeofResource(hModule, hRsrc);
+	if(0 == dwSize)		return false;
+
+	HGLOBAL hGlobal	= LoadResource(hModule, hRsrc);
+	if(NULL == hGlobal)	return false;
+
+	LPVOID pBuffer	= LockResource(hGlobal);
+	if(NULL == pBuffer)	return false;
+
+	res_data	=	pBuffer;
+	res_size	=	dwSize;
+
+	return	true;
+}
