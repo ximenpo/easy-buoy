@@ -1,6 +1,14 @@
 #include	"stdafx.h"
 
+#include	<string>
+
 #include	<CommCtrl.h>
+
+#include	<Shlwapi.h>
+#include	<ShellAPI.h>
+#include	<ShlObj.h>
+
+#pragma	comment(lib, "Shlwapi.lib")
 
 //
 //	判断是否64位系统
@@ -128,8 +136,7 @@ bool	fetch_resource_data(
     const char*	res_type,
 	void*&		res_data,
 	size_t&		res_size
-	)
-{
+	){
 	HRSRC hRsrc		= FindResourceA(hModule, res_name, res_type);
 	if(NULL == hRsrc)	return false;
 
@@ -146,4 +153,26 @@ bool	fetch_resource_data(
 	res_size	=	dwSize;
 
 	return	true;
+}
+
+//
+//	获取HBITMAP大小
+//
+bool get_bitmap_size(HBITMAP hbmp, long& nWidth, long& nHeight){
+	BITMAP bmp;
+	if(NULL == hbmp || !::GetObject(hbmp, sizeof(BITMAP), &bmp)){
+		return false;
+	}
+
+	nWidth	= bmp.bmWidth;
+	nHeight	= bmp.bmHeight;
+	return true;
+}
+
+std::string	get_app_root_path(){
+	char szPath[MAX_PATH] = {0};
+	GetModuleFileName(GetModuleHandle(NULL), szPath, MAX_PATH);
+	PathRemoveFileSpec(szPath);
+	PathAddBackslash(szPath);
+	return	std::string(szPath);
 }

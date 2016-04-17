@@ -29,14 +29,21 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
 	// locust: 根据系统启动对应的程序
+#if	!defined(_WIN64)
 	{
 		extern	bool	is_64bits_windows();
 		if(is_64bits_windows()){
-#if	!defined(_WIN64)
-			MessageBox(NULL, "", "64BIT", MB_OK);
+			extern	void	handle_start_64bits_app();
+			handle_start_64bits_app();
 			return	0;
-#endif
 		}
+	}
+#endif
+
+	// locust: 初始化应用程序
+	{
+		extern	void	handle_init_app();
+		handle_init_app();
 	}
 
 	MSG msg;

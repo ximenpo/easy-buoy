@@ -11,3 +11,8 @@ bool	fetch_resource_data(
 	void*&		res_data,
 	size_t&		res_size
 	);
+
+bool get_bitmap_size(HBITMAP hbmp, long& nWidth, long& nHeight);
+
+
+std::string	get_app_root_path();

@@ -28,6 +28,7 @@
     <None Include="windesk-buoy.ico">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="buoy.rgn" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
