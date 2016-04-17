@@ -4,6 +4,9 @@
 #include "stdafx.h"
 #include "windesk-buoy.h"
 
+// locust: 方便消息处理
+#include	<WindowsX.h>
+
 #define MAX_LOADSTRING 100
 
 // 全局变量:
@@ -204,8 +207,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		hdc = BeginPaint(hWnd, &ps);
 		// locust: 绘图的处理
 		{
-			extern	void	main_draw(HWND hWnd, HDC hdc);
-			main_draw(hWnd, hdc);
+			extern	void	handle_draw(HWND hWnd, HDC hdc);
+			handle_draw(hWnd, hdc);
 		}
 		EndPaint(hWnd, &ps);
 		break;
@@ -213,6 +216,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_ERASEBKGND:
 		{
 			return	TRUE;
+		}
+		break;
+		// locust: 鼠标点击处理
+	case WM_LBUTTONDOWN:
+	case WM_RBUTTONDOWN:
+		{
+			extern	void	handle_click(HWND hWnd, int x, int y);
+			handle_click(hWnd, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		}
 		break;
 	case WM_DESTROY:

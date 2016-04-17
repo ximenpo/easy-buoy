@@ -16,6 +16,9 @@
     <Filter Include="logic">
       <UniqueIdentifier>{0f8e1038-88e8-4a99-836b-bc00d7b3b9b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="libs">
+      <UniqueIdentifier>{18e07b14-ddfe-41eb-a0e0-78b8795cef88}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -39,7 +42,13 @@
     <ClInclude Include="windesk-buoy.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="funcs.h">
+    <ClInclude Include="libs\BitmapHDC.h">
+      <Filter>libs</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\HtmlUtils.h">
+      <Filter>libs</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\funcs.h">
       <Filter>logic</Filter>
     </ClInclude>
   </ItemGroup>
@@ -50,14 +59,17 @@
     <ClCompile Include="windesk-buoy.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="external-libs.cpp">
+    <ClCompile Include="libs\external-libs.cpp">
+      <Filter>libs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\main.cpp">
       <Filter>logic</Filter>
     </ClCompile>
-    <ClCompile Include="win-utils.cpp">
+    <ClCompile Include="logic\win-utils.cpp">
       <Filter>logic</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>logic</Filter>
+    <ClCompile Include="libs\DrawHTML.C">
+      <Filter>libs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

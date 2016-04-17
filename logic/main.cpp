@@ -5,6 +5,8 @@
 #include	"simple/string.h"
 
 #include	"funcs.h"
+#include	"libs/BitmapHDC.h"
+#include	"libs/HtmlUtils.h"
 
 void	main_procedure(HWND hWnd){
 	KillTimer(hWnd, 100);
@@ -16,10 +18,20 @@ void	main_procedure(HWND hWnd){
 	
 	char	wnd_class[MAX_PATH]	= {};
 	GetClassName(hWnd, wnd_class, sizeof(wnd_class) - 1);
-	CreateWindowEx(NULL, wnd_class, "点我试试", WS_VISIBLE | WS_BORDER | WS_CHILD, rc.left, rc.top, 40, 40, get_desktop_SysListView_HWND(), NULL, NULL, NULL);
+	CreateWindowEx(NULL, wnd_class, "点我试试", WS_VISIBLE | WS_BORDER | WS_CHILD, rc.left, rc.top, 100, 100, get_desktop_SysListView_HWND(), NULL, NULL, NULL);
 }
 
-void	main_draw(HWND hWnd, HDC hdc){
+void	handle_draw(HWND hWnd, HDC hdc){
+	static	BitmapHDC	dc;
+	dc.Initialize(100, 100, hdc, RGB(255,0,0));
+
 	RECT	rc	= {0,0,100,100};
-	ExtTextOut(hdc, 0, 0, ETO_OPAQUE, &rc, NULL, 0, NULL);
+	ExtTextOut(dc, 0, 0, ETO_OPAQUE, &rc, NULL, 0, NULL);
+	DrawHTML(dc, "<b>你好</b>, world", -1, &rc, DT_CENTER, 0);
+
+	BitBlt(hdc, 0, 0, 100, 100, dc, 0, 0, SRCCOPY);
+}
+
+void	handle_click(HWND hWnd, int x, int y){
+	PostQuitMessage(0);
 }
