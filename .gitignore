@@ -30,3 +30,7 @@
 *.sdf
 *.user
 *.suo
+
+Debug
+Release
+ipch

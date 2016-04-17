@@ -107,8 +107,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    hInst = hInstance; // 将实例句柄存储在全局变量中
 
-#define	APP_HIDE_MAINWND	1
-
 #if	APP_HIDE_MAINWND
    // locust: hide main window
    {
