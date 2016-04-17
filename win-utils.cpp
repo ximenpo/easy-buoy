@@ -99,8 +99,6 @@ bool	get_desktop_icon_RECT(const char* psCaption, RECT* pRect){
 		WriteProcessMemory(hProcess, pRemoteItem, &xItem, sizeof(xItem), NULL);
 		::SendMessage(hView, LVM_GETITEM, 0, (LPARAM)pRemoteItem);
 		ReadProcessMemory(hProcess, pRemoteText, sText, sizeof(sText), NULL);
-		OutputDebugString(sText);
-		OutputDebugString("\n");
 		if(0 == _strcmpi(sText, psCaption)){
 			if(NULL != pRect){
 				memset(pRect, 0, sizeof(RECT));

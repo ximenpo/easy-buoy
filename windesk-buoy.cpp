@@ -18,19 +18,21 @@ LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY _tWinMain(HINSTANCE hInstance,
-                     HINSTANCE hPrevInstance,
-                     LPTSTR    lpCmdLine,
-                     int       nCmdShow)
+	HINSTANCE hPrevInstance,
+	LPTSTR    lpCmdLine,
+	int       nCmdShow)
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
- 	// locust: 根据系统启动对应的程序
+	// locust: 根据系统启动对应的程序
 	{
 		extern	bool	is_64bits_windows();
 		if(is_64bits_windows()){
+#if	!defined(_WIN64)
 			MessageBox(NULL, "", "64BIT", MB_OK);
 			return	0;
+#endif
 		}
 	}
 
@@ -111,45 +113,45 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   HWND hWnd;
+	HWND hWnd;
 
-   hInst = hInstance; // 将实例句柄存储在全局变量中
+	hInst = hInstance; // 将实例句柄存储在全局变量中
 
 #if	APP_HIDE_MAINWND
-   // locust: hide main window
-   {
-	   hWnd = CreateWindowEx(WS_EX_NOACTIVATE, szWindowClass, szTitle, WS_POPUP,
-		   CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
+	// locust: hide main window
+	{
+		hWnd = CreateWindowEx(WS_EX_NOACTIVATE, szWindowClass, szTitle, WS_POPUP,
+			CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
 
-	   if (!hWnd)
-	   {
-		   return FALSE;
-	   }
+		if (!hWnd)
+		{
+			return FALSE;
+		}
 
-	   ShowWindow(hWnd, SW_HIDE);
-	   UpdateWindow(hWnd);
-   }
+		ShowWindow(hWnd, SW_HIDE);
+		UpdateWindow(hWnd);
+	}
 #else
-   {
-	   hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-		   CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
+	{
+		hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+			CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
 
-	   if (!hWnd)
-	   {
-		   return FALSE;
-	   }
+		if (!hWnd)
+		{
+			return FALSE;
+		}
 
-	   ShowWindow(hWnd, nCmdShow);
-	   UpdateWindow(hWnd);
-   }
+		ShowWindow(hWnd, nCmdShow);
+		UpdateWindow(hWnd);
+	}
 #endif
-   
-   // locust: start timer
-   {
-		SetTimer(hWnd, 100, 500, NULL);
-   }
 
-   return TRUE;
+	// locust: start timer
+	{
+		SetTimer(hWnd, 100, 500, NULL);
+	}
+
+	return TRUE;
 }
 
 //
@@ -167,7 +169,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	int wmId, wmEvent;
 	PAINTSTRUCT ps;
 	HDC hdc;
-	
+
 	// locust: timer handler
 	{
 		UNREFERENCED_PARAMETER(wmId);
@@ -200,8 +202,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
-		// TODO: 在此添加任意绘图代码...
+		// locust: 绘图的处理
+		{
+			extern	void	main_draw(HWND hWnd, HDC hdc);
+			main_draw(hWnd, hdc);
+		}
 		EndPaint(hWnd, &ps);
+		break;
+		// locust: 背景的处理
+	case WM_ERASEBKGND:
+		{
+			return	TRUE;
+		}
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);

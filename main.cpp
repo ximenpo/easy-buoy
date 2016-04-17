@@ -13,6 +13,13 @@ void	main_procedure(HWND hWnd){
 	get_desktop_icon_RECT("剑雨江湖", &rc);
 
 	OutputDebugString(string_format("%ld,%ld,%ld,%ld\n", rc.left, rc.top, rc.right, rc.bottom).c_str());
+	
+	char	wnd_class[MAX_PATH]	= {};
+	GetClassName(hWnd, wnd_class, sizeof(wnd_class) - 1);
+	CreateWindowEx(NULL, wnd_class, "点我试试", WS_VISIBLE | WS_BORDER | WS_CHILD, rc.left, rc.top, 40, 40, get_desktop_SysListView_HWND(), NULL, NULL, NULL);
+}
 
-	CreateWindowEx(NULL, "Button", "点我试试", WS_VISIBLE | WS_BORDER | WS_CHILD, rc.left, rc.top, 40, 40, get_desktop_SysListView_HWND(), NULL, NULL, NULL);
+void	main_draw(HWND hWnd, HDC hdc){
+	RECT	rc	= {0,0,100,100};
+	ExtTextOut(hdc, 0, 0, ETO_OPAQUE, &rc, NULL, 0, NULL);
 }
