@@ -14,6 +14,9 @@ HINSTANCE hInst;								// 当前实例
 TCHAR szTitle[MAX_LOADSTRING];					// 标题栏文本
 TCHAR szWindowClass[MAX_LOADSTRING];			// 主窗口类名
 
+// locust: 全局对象
+static	HWND	g_hWnd	= NULL;
+
 // 此代码模块中包含的函数的前向声明:
 ATOM				MyRegisterClass(HINSTANCE hInstance);
 BOOL				InitInstance(HINSTANCE, int);
@@ -158,6 +161,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 	// locust: start timer
 	{
+		g_hWnd	= hWnd;
 		SetTimer(hWnd, 100, 500, NULL);
 	}
 
@@ -234,7 +238,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_DESTROY:
-		PostQuitMessage(0);
+		// locust: 鼠标点击处理
+		//PostQuitMessage(0);
+		if(hWnd == g_hWnd){
+			PostQuitMessage(0);
+		}else{
+			return DefWindowProc(hWnd, message, wParam, lParam);
+		}
 		break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);

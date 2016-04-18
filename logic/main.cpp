@@ -21,7 +21,7 @@ HBITMAP		g_hBitmap	= NULL;
 
 procedure_context	g_ctx;
 
-void	show_buoy(HWND hWnd){
+void	show_buoy_window(HWND hWnd){
 	RECT	rc	= {};
 	if(!get_desktop_icon_RECT("½£Óê½­ºþ", &rc)){
 		return;
@@ -68,7 +68,7 @@ void	main_procedure(HWND hWnd){
 
 	PROCEDURE_BEGIN(&g_ctx);
 
-	show_buoy(hWnd);
+	show_buoy_window(hWnd);
 
 	old_timestamp_	= timestamp_.now();
 	while(NULL != g_hWndBuoy){
@@ -80,7 +80,7 @@ void	main_procedure(HWND hWnd){
 		PROCEDURE_YIELD();
 	}
 
-	show_buoy(hWnd);
+	show_buoy_window(hWnd);
 
 	old_timestamp_	= timestamp_.now();
 	while(NULL != g_hWndBuoy){
@@ -132,8 +132,8 @@ void	handle_click(HWND hWnd, int x, int y){
 	g_hWndBuoy	= NULL;
 	g_dcBuoy.UnInitialize();
 
-	CloseWindow(hWnd);
-	//DestroyWindow(hWnd);
+	ShowWindow(hWnd, SW_HIDE);
+	DestroyWindow(hWnd);
 }
 
 void	handle_start_64bits_app(){
