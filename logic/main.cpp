@@ -47,7 +47,7 @@ void	show_buoy_window(HWND hWnd){
 	char	wnd_class[MAX_PATH]	= {};
 	GetClassName(hWnd, wnd_class, sizeof(wnd_class) - 1);
 
-	g_hWndBuoy	= CreateWindowEx(NULL, wnd_class, NULL, WS_VISIBLE | WS_BORDER | WS_CHILD, rc.right - 15, rc.top - 20, g_szBuoy.cx, g_szBuoy.cy, get_desktop_SysListView_HWND(), NULL, NULL, NULL);
+	g_hWndBuoy	= CreateWindowEx(NULL, wnd_class, NULL, WS_VISIBLE | WS_BORDER | WS_CHILD, rc.right - 15, rc.top - 160, g_szBuoy.cx, g_szBuoy.cy, get_desktop_SysListView_HWND(), NULL, NULL, NULL);
 
 	XFORM xform;	  
 	xform.eM11 = (FLOAT) 1.0;          
@@ -113,7 +113,7 @@ void	handle_draw(HWND hWnd, HDC hdc){
 	//DrawHTML(dc, "<b>你好</b>, world", -1, &rc, DT_CENTER, 0);
 
 	if(NULL != g_dcBuoy){
-		BitBlt(hdc, 0, 0, g_szBuoy.cx, g_szBuoy.cy, g_dcBuoy, 0, 0, SRCCOPY);
+		BitBlt(hdc, 0, 0, g_szBuoy.cx, g_szBuoy.cy, g_dcBuoy, 1, 1, SRCCOPY);
 	}
 }
 
@@ -122,7 +122,7 @@ void	handle_click(HWND hWnd, int x, int y){
 		return;
 	}
 
-	RECT	rc	= {37, 42, 120, 66};
+	RECT	rc	= {282, 137, 293, 148};
 	POINT	pt	= {x, y};
 	if(!PtInRect(&rc, pt)){
 		// TODO: 启动应用程序
