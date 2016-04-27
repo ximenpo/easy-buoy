@@ -32,19 +32,11 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	// locust: 根据系统启动对应的程序
-#if	!defined(_WIN64)
-	{
-		if(win_is_64bits_system()){
-			handle_start_64bits_app();
-			return	0;
-		}
-	}
-#endif
-
 	// locust: 初始化应用程序
 	{
-		handle_init_app();
+		if(!handle_init_app()){
+			return	FALSE;
+		}
 	}
 
 	MSG msg;
@@ -192,21 +184,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
 		// locust: 绘图的处理
-		{
+		if(hWnd != g_hWnd){
 			handle_draw(hWnd, hdc);
 		}
 		EndPaint(hWnd, &ps);
 		break;
 		// locust: 背景的处理
 	case WM_ERASEBKGND:
-		{
+		if(hWnd != g_hWnd){
 			return	TRUE;
 		}
 		break;
 		// locust: 鼠标点击处理
 	case WM_LBUTTONDOWN:
 	case WM_RBUTTONDOWN:
-		{
+		if(hWnd != g_hWnd){
 			handle_click(hWnd, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		}
 		break;

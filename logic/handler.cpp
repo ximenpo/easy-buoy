@@ -116,8 +116,24 @@ void	main_procedure(HWND hWnd){
 	PROCEDURE_END();
 }
 
-void	handle_init_app(){
+void	handle_start_64bits_app(){
+	// TODO: 启动64位应用程序
+	ShellExecute(NULL, "open", (win_get_root_path() + "windesk-buoy.amd64.exe").c_str(), NULL, win_get_root_path().c_str(), SW_SHOW);
+}
+
+bool	handle_init_app(){
+	// locust: 根据系统启动对应的程序
+#if	!defined(_WIN64)
+	{
+		if(win_is_64bits_system()){
+			handle_start_64bits_app();
+			return	false;
+		}
+	}
+#endif
+
 	SetCurrentDirectory(win_get_root_path().c_str());
+	return	true;
 }
 
 void	handle_draw(HWND hWnd, HDC hdc){
@@ -158,9 +174,4 @@ void	handle_click(HWND hWnd, int x, int y){
 
 	ShowWindow(hWnd, SW_HIDE);
 	DestroyWindow(hWnd);
-}
-
-void	handle_start_64bits_app(){
-	// TODO: 启动64位应用程序
-	ShellExecute(NULL, "open", (win_get_root_path() + "windesk-buoy.amd64.exe").c_str(), NULL, win_get_root_path().c_str(), SW_SHOW);
 }
