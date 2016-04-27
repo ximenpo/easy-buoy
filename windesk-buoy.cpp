@@ -6,6 +6,8 @@
 
 // locust: 方便消息处理
 #include	<WindowsX.h>
+#include	"libs/win-utils.h"
+#include	"logic/handler.h"
 
 #define MAX_LOADSTRING 100
 
@@ -33,9 +35,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	// locust: 根据系统启动对应的程序
 #if	!defined(_WIN64)
 	{
-		extern	bool	win_is_64bits_system();
 		if(win_is_64bits_system()){
-			extern	void	handle_start_64bits_app();
 			handle_start_64bits_app();
 			return	0;
 		}
@@ -44,7 +44,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	// locust: 初始化应用程序
 	{
-		extern	void	handle_init_app();
 		handle_init_app();
 	}
 
@@ -182,7 +181,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		UNREFERENCED_PARAMETER(wmId);
 		UNREFERENCED_PARAMETER(wmEvent);
 
-		extern	void	main_procedure(HWND hWnd);
 		switch (message)
 		{
 		case WM_TIMER:		main_procedure(hWnd);		break;
@@ -195,7 +193,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		hdc = BeginPaint(hWnd, &ps);
 		// locust: 绘图的处理
 		{
-			extern	void	handle_draw(HWND hWnd, HDC hdc);
 			handle_draw(hWnd, hdc);
 		}
 		EndPaint(hWnd, &ps);
@@ -210,7 +207,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_LBUTTONDOWN:
 	case WM_RBUTTONDOWN:
 		{
-			extern	void	handle_click(HWND hWnd, int x, int y);
 			handle_click(hWnd, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		}
 		break;

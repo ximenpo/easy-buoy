@@ -21,14 +21,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ReadMe.txt" />
     <None Include="small.ico">
       <Filter>资源文件</Filter>
     </None>
     <None Include="windesk-buoy.ico">
       <Filter>资源文件</Filter>
     </None>
-    <None Include="buoy.rgn" />
+    <None Include="COPY-RELEASES-TO-BIN.CMD" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -49,8 +48,11 @@
     <ClInclude Include="libs\HtmlUtils.h">
       <Filter>libs</Filter>
     </ClInclude>
-    <ClInclude Include="logic\funcs.h">
+    <ClInclude Include="logic\handler.h">
       <Filter>logic</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\win-utils.h">
+      <Filter>libs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -63,13 +65,13 @@
     <ClCompile Include="libs\external-libs.cpp">
       <Filter>libs</Filter>
     </ClCompile>
-    <ClCompile Include="logic\main.cpp">
-      <Filter>logic</Filter>
-    </ClCompile>
-    <ClCompile Include="logic\win-utils.cpp">
-      <Filter>logic</Filter>
-    </ClCompile>
     <ClCompile Include="libs\DrawHTML.C">
+      <Filter>libs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\handler.cpp">
+      <Filter>logic</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\win-utils.cpp">
       <Filter>libs</Filter>
     </ClCompile>
   </ItemGroup>

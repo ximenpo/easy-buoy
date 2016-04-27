@@ -1,5 +1,7 @@
 #pragma	once
 
+#include	<string>
+
 bool	win_is_64bits_system();
 HWND	win_get_desktop_SysListView();
 bool	win_get_desktop_icon_rect(const char* psName, RECT* pRect);

@@ -152,15 +152,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="buoy.rgn" />
-    <None Include="ReadMe.txt" />
+    <None Include="COPY-RELEASES-TO-BIN.CMD" />
     <None Include="small.ico" />
     <None Include="windesk-buoy.ico" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libs\BitmapHDC.h" />
     <ClInclude Include="libs\HtmlUtils.h" />
-    <ClInclude Include="logic\funcs.h" />
+    <ClInclude Include="libs\win-utils.h" />
+    <ClInclude Include="logic\handler.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -172,8 +172,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="libs\external-libs.cpp" />
-    <ClCompile Include="logic\main.cpp" />
-    <ClCompile Include="logic\win-utils.cpp" />
+    <ClCompile Include="libs\win-utils.cpp" />
+    <ClCompile Include="logic\handler.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

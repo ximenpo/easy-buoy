@@ -12,7 +12,7 @@
 #include	"simple/procedure.h"
 #include	"simple/timestamp.h"
 
-#include	"funcs.h"
+#include	"libs/win-utils.h"
 #include	"libs/BitmapHDC.h"
 #include	"libs/HtmlUtils.h"
 
