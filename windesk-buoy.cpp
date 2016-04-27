@@ -33,8 +33,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	// locust: 根据系统启动对应的程序
 #if	!defined(_WIN64)
 	{
-		extern	bool	is_64bits_windows();
-		if(is_64bits_windows()){
+		extern	bool	win_is_64bits_system();
+		if(win_is_64bits_system()){
 			extern	void	handle_start_64bits_app();
 			handle_start_64bits_app();
 			return	0;

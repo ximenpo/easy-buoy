@@ -6,7 +6,6 @@
 #include	<CommCtrl.h>
 
 #include	<Shlwapi.h>
-#include	<ShellAPI.h>
 #include	<ShlObj.h>
 
 #pragma	comment(lib, "Shlwapi.lib")
@@ -14,7 +13,7 @@
 //
 //	判断是否64位系统
 //
-bool	is_64bits_windows(){
+bool	win_is_64bits_system(){
 	typedef VOID (WINAPI *LPFN_GetNativeSystemInfo)(LPSYSTEM_INFO lpSystemInfo);
 
 	SYSTEM_INFO si;
@@ -35,7 +34,7 @@ bool	is_64bits_windows(){
 //
 //	根据类名获取子窗口（第一个），亦可用 FindWindowEx 代替
 //
-HWND	find_child_by_class(HWND hWnd, const char* sClass){
+HWND	win_find_child_by_class(HWND hWnd, const char* sClass){
 	HWND	hChild	= GetWindow(hWnd, GW_CHILD);
 	if(NULL == hChild){
 		return	hChild;
@@ -57,19 +56,19 @@ HWND	find_child_by_class(HWND hWnd, const char* sClass){
 //
 //	获取桌面SysListView窗口句柄
 //
-HWND	get_desktop_SysListView_HWND(){
+HWND	win_get_desktop_SysListView(){
 	HWND	hWnd	= GetDesktopWindow();
 	if(NULL != hWnd){
-		hWnd	=	find_child_by_class(hWnd, "Progman");
+		hWnd	=	win_find_child_by_class(hWnd, "Progman");
 		if(NULL == hWnd){
 			hWnd	= FindWindow("Progman", NULL);
 		}
 	}
 	if(NULL != hWnd){
-		hWnd	=	find_child_by_class(hWnd, "SHELLDLL_DefView");
+		hWnd	=	win_find_child_by_class(hWnd, "SHELLDLL_DefView");
 	}
 	if(NULL != hWnd){
-		hWnd	=	find_child_by_class(hWnd, "SysListView32");
+		hWnd	=	win_find_child_by_class(hWnd, "SysListView32");
 	}
 	return	hWnd;
 }
@@ -77,9 +76,9 @@ HWND	get_desktop_SysListView_HWND(){
 //
 //	获取桌面图标矩形
 //
-bool	get_desktop_icon_RECT(const char* psCaption, RECT* pRect){
+bool	win_get_desktop_icon_rect(const char* psCaption, RECT* pRect){
 	HANDLE	hProcess	= NULL;
-	HWND	hView	= get_desktop_SysListView_HWND();
+	HWND	hView		= win_get_desktop_SysListView();
 	{
 		DWORD PID;
 		GetWindowThreadProcessId(hView, &PID);
@@ -131,7 +130,7 @@ bool	get_desktop_icon_RECT(const char* psCaption, RECT* pRect){
 //
 //	获取资源内容
 //
-bool	fetch_resource_data(
+bool	win_load_resource_data(
     HMODULE		hModule,
     const char*	res_name,
     const char*	res_type,
@@ -159,7 +158,7 @@ bool	fetch_resource_data(
 //
 //	获取文件内容(必须确保空间足够大)
 //
-bool	fetch_file_data(
+bool	win_load_file_data(
     const char*	file_name,
 	void*		res_data,
 	size_t&		res_size
@@ -190,7 +189,7 @@ bool	fetch_file_data(
 //
 //	获取HBITMAP大小
 //
-bool get_bitmap_size(HBITMAP hbmp, long& nWidth, long& nHeight){
+bool	win_get_bitmap_size(HBITMAP hbmp, long& nWidth, long& nHeight){
 	BITMAP bmp;
 	if(NULL == hbmp || !::GetObject(hbmp, sizeof(BITMAP), &bmp)){
 		return false;
@@ -204,7 +203,7 @@ bool get_bitmap_size(HBITMAP hbmp, long& nWidth, long& nHeight){
 //
 //	获取当前应用根目录（最后带分隔符/）
 //
-std::string	get_app_root_path(){
+std::string	win_get_root_path(){
 	char szPath[MAX_PATH] = {0};
 	GetModuleFileName(GetModuleHandle(NULL), szPath, MAX_PATH);
 	PathRemoveFileSpec(szPath);
@@ -212,10 +211,10 @@ std::string	get_app_root_path(){
 	return	std::string(szPath);
 }
 
-//创建快捷方式 
-/*szPath 快捷方式的目标应用程序名
-szLink快捷方式的数据文件名(*.lnk) */
-bool	create_shortcut(const char* szPath, const char* szWorkingPath, const char* szLink){ 
+//
+//	创建快捷方式 
+//
+bool	win_create_shortcut(const char* szPath, const char* szWorkingPath, const char* szLink){ 
 	HRESULT hres ; 
 	IShellLink * psl ; 
 	IPersistFile* ppf ; 

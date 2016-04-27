@@ -3,7 +3,7 @@
 #include	<string>
 #include	<memory>
 
-#include	<WindowsX.h>
+//#include	<WindowsX.h>
 #include	<Shlwapi.h>
 #include	<ShellAPI.h>
 #include	<ShlObj.h>
@@ -27,9 +27,9 @@ void	create_shortcuts(){
 	char FolderPath[MAX_PATH] = {0};
 	SHGetSpecialFolderPath(0, FolderPath, (true?CSIDL_COMMON_DESKTOPDIRECTORY:CSIDL_DESKTOPDIRECTORY), FALSE);
 	if(!PathFileExists(string_format("%s\\%s.lnk", FolderPath, "½£Óê½­ºþ").c_str())){
-		create_shortcut(
-			(get_app_root_path() + "6998_½£Óê½­ºþ.exe").c_str(),
-			get_app_root_path().c_str(), 
+		win_create_shortcut(
+			(win_get_root_path() + "6998_½£Óê½­ºþ.exe").c_str(),
+			win_get_root_path().c_str(), 
 			string_format("%s\\%s.lnk", FolderPath, "½£Óê½­ºþ").c_str()
 			);
 	}
@@ -37,35 +37,35 @@ void	create_shortcuts(){
 
 bool	show_buoy_window(HWND hWnd){
 	RECT	rc	= {};
-	if(!get_desktop_icon_RECT("½£Óê½­ºþ", &rc)){
+	if(!win_get_desktop_icon_rect("½£Óê½­ºþ", &rc)){
 		create_shortcuts();
 		return	false;
 	}
 
 	if(NULL == g_hBitmap){
-		g_hBitmap	= (HBITMAP)LoadImage(NULL, (get_app_root_path() + "buoy.bmp").c_str(),IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION|LR_DEFAULTSIZE|LR_LOADFROMFILE);
+		g_hBitmap	= (HBITMAP)LoadImage(NULL, (win_get_root_path() + "buoy.bmp").c_str(),IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION|LR_DEFAULTSIZE|LR_LOADFROMFILE);
 	}
 	if(NULL == g_hBitmap){
 		return	true;
 	}
 
-	if(!get_bitmap_size(g_hBitmap, g_szBuoy.cx, g_szBuoy.cy)){
+	if(!win_get_bitmap_size(g_hBitmap, g_szBuoy.cx, g_szBuoy.cy)){
 		return	true;
 	}
 	
 	size_t	size	= 0;
-	if(!fetch_file_data("buoy.rgn", NULL, size)){
+	if(!win_load_file_data("buoy.rgn", NULL, size)){
 		return	true;
 	}
 	std::auto_ptr<char>	data(new char[size]);
-	if(!fetch_file_data("buoy.rgn", data.get(), size)){
+	if(!win_load_file_data("buoy.rgn", data.get(), size)){
 		return	true;
 	}
 
 	char	wnd_class[MAX_PATH]	= {};
 	GetClassName(hWnd, wnd_class, sizeof(wnd_class) - 1);
 
-	g_hWndBuoy	= CreateWindowEx(NULL, wnd_class, NULL, WS_VISIBLE | WS_BORDER | WS_CHILD, rc.right - 15, rc.top - 160, g_szBuoy.cx, g_szBuoy.cy, get_desktop_SysListView_HWND(), NULL, NULL, NULL);
+	g_hWndBuoy	= CreateWindowEx(NULL, wnd_class, NULL, WS_VISIBLE | WS_BORDER | WS_CHILD, rc.right - 15, rc.top - 160, g_szBuoy.cx, g_szBuoy.cy, win_get_desktop_SysListView(), NULL, NULL, NULL);
 
 	XFORM xform;
 	xform.eM11 = (FLOAT) 1.0;          
@@ -117,7 +117,7 @@ void	main_procedure(HWND hWnd){
 }
 
 void	handle_init_app(){
-	SetCurrentDirectory(get_app_root_path().c_str());
+	SetCurrentDirectory(win_get_root_path().c_str());
 }
 
 void	handle_draw(HWND hWnd, HDC hdc){
@@ -150,7 +150,7 @@ void	handle_click(HWND hWnd, int x, int y){
 	POINT	pt	= {x, y};
 	if(!PtInRect(&rc, pt)){
 		// TODO: Æô¶¯Ó¦ÓÃ³ÌÐò
-		ShellExecute(NULL, "open", (get_app_root_path() + "6998_½£Óê½­ºþ.exe").c_str(), NULL, get_app_root_path().c_str(), SW_SHOW);
+		ShellExecute(NULL, "open", (win_get_root_path() + "6998_½£Óê½­ºþ.exe").c_str(), NULL, win_get_root_path().c_str(), SW_SHOW);
 	}
 
 	g_hWndBuoy	= NULL;
@@ -162,5 +162,5 @@ void	handle_click(HWND hWnd, int x, int y){
 
 void	handle_start_64bits_app(){
 	// TODO: Æô¶¯64Î»Ó¦ÓÃ³ÌÐò
-	ShellExecute(NULL, "open", (get_app_root_path() + "windesk-buoy.amd64.exe").c_str(), NULL, get_app_root_path().c_str(), SW_SHOW);
+	ShellExecute(NULL, "open", (win_get_root_path() + "windesk-buoy.amd64.exe").c_str(), NULL, win_get_root_path().c_str(), SW_SHOW);
 }
