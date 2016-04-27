@@ -11,8 +11,15 @@ bool	fetch_resource_data(
 	void*&		res_data,
 	size_t&		res_size
 	);
+bool	fetch_file_data(
+    const char*	file_name,
+	void*		res_data,
+	size_t&		res_size
+	);
 
 bool get_bitmap_size(HBITMAP hbmp, long& nWidth, long& nHeight);
 
 
 std::string	get_app_root_path();
+
+bool	create_shortcut(const char* szPath, const char* szWorkingPath, const char* szLink);

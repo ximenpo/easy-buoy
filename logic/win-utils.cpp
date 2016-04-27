@@ -1,6 +1,7 @@
 #include	"stdafx.h"
 
 #include	<string>
+#include	<fstream>
 
 #include	<CommCtrl.h>
 
@@ -156,6 +157,37 @@ bool	fetch_resource_data(
 }
 
 //
+//	获取文件内容(必须确保空间足够大)
+//
+bool	fetch_file_data(
+    const char*	file_name,
+	void*		res_data,
+	size_t&		res_size
+	){
+	std::ifstream	ifs(file_name, std::ios::binary);
+	if(!ifs){
+		return	false;
+	}
+
+	ifs.seekg(0, std::ios::end);
+	size_t	file_size	= size_t(ifs.tellg());
+	if(NULL == res_data){
+		res_size	= file_size;
+		return	true;
+	}
+
+	if(res_size < file_size){
+		return	false;
+	}
+
+	res_size	= file_size;
+	ifs.seekg(0, std::ios::beg);
+	ifs.read((char*)res_data, res_size);
+
+	return	true;
+}
+
+//
 //	获取HBITMAP大小
 //
 bool get_bitmap_size(HBITMAP hbmp, long& nWidth, long& nHeight){
@@ -169,10 +201,59 @@ bool get_bitmap_size(HBITMAP hbmp, long& nWidth, long& nHeight){
 	return true;
 }
 
+//
+//	获取当前应用根目录（最后带分隔符/）
+//
 std::string	get_app_root_path(){
 	char szPath[MAX_PATH] = {0};
 	GetModuleFileName(GetModuleHandle(NULL), szPath, MAX_PATH);
 	PathRemoveFileSpec(szPath);
 	PathAddBackslash(szPath);
 	return	std::string(szPath);
+}
+
+//创建快捷方式 
+/*szPath 快捷方式的目标应用程序名
+szLink快捷方式的数据文件名(*.lnk) */
+bool	create_shortcut(const char* szPath, const char* szWorkingPath, const char* szLink){ 
+	HRESULT hres ; 
+	IShellLink * psl ; 
+	IPersistFile* ppf ; 
+	WCHAR wsz[MAX_PATH]={L""}; 
+	////初始化COM 
+	CoInitialize (NULL); 
+	//创建一个IShellLink实例 
+	hres = CoCreateInstance( CLSID_ShellLink, NULL,CLSCTX_INPROC_SERVER, IID_IShellLink, (void **)&psl);
+
+	if( FAILED( hres)) 
+	{ 
+		CoUninitialize (); 
+		return false ; 
+	} 
+
+	//设置目标应用程序 
+	psl->SetPath( szPath);
+	psl->SetWorkingDirectory(szWorkingPath); 
+
+	//从IShellLink获取其IPersistFile接口 
+	//用于保存快捷方式的数据文件 (*.lnk) 
+	hres = psl->QueryInterface(IID_IPersistFile, (void**)&ppf) ; 
+	if( FAILED( hres)) 
+	{ 
+		CoUninitialize (); 
+		return false ; 
+	} 
+
+	// 确保数据文件名为ANSI格式 
+	MultiByteToWideChar( CP_ACP, 0, szLink, -1, wsz, MAX_PATH) ; 
+
+	//调用IPersistFile::Save 
+	//保存快捷方式的数据文件 (*.lnk) 
+	hres = ppf->Save(wsz, STGM_READWRITE); 
+	//释放IPersistFile和IShellLink接口 
+	ppf->Release() ; 
+	psl->Release() ; 
+	CoUninitialize();
+
+	return true; 
 }

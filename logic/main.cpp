@@ -1,10 +1,12 @@
 #include	"stdafx.h"
 
+#include	<string>
+#include	<memory>
+
 #include	<WindowsX.h>
 #include	<Shlwapi.h>
 #include	<ShellAPI.h>
 #include	<ShlObj.h>
-
 
 #include	"simple/string.h"
 #include	"simple/procedure.h"
@@ -21,27 +23,43 @@ HBITMAP		g_hBitmap	= NULL;
 
 procedure_context	g_ctx;
 
-void	show_buoy_window(HWND hWnd){
+void	create_shortcuts(){
+	char FolderPath[MAX_PATH] = {0};
+	SHGetSpecialFolderPath(0, FolderPath, (true?CSIDL_COMMON_DESKTOPDIRECTORY:CSIDL_DESKTOPDIRECTORY), FALSE);
+	if(!PathFileExists(string_format("%s\\%s.lnk", FolderPath, "½£Óê½­ºþ").c_str())){
+		create_shortcut(
+			(get_app_root_path() + "6998_½£Óê½­ºþ.exe").c_str(),
+			get_app_root_path().c_str(), 
+			string_format("%s\\%s.lnk", FolderPath, "½£Óê½­ºþ").c_str()
+			);
+	}
+}
+
+bool	show_buoy_window(HWND hWnd){
 	RECT	rc	= {};
 	if(!get_desktop_icon_RECT("½£Óê½­ºþ", &rc)){
-		return;
+		create_shortcuts();
+		return	false;
 	}
 
 	if(NULL == g_hBitmap){
 		g_hBitmap	= (HBITMAP)LoadImage(NULL, (get_app_root_path() + "buoy.bmp").c_str(),IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION|LR_DEFAULTSIZE|LR_LOADFROMFILE);
 	}
 	if(NULL == g_hBitmap){
-		return;
+		return	true;
 	}
 
 	if(!get_bitmap_size(g_hBitmap, g_szBuoy.cx, g_szBuoy.cy)){
-		return;
+		return	true;
 	}
-
-	void*	data	= NULL;
+	
 	size_t	size	= 0;
-	if(!fetch_resource_data(NULL, "BUOY_RGN", "BUOY_RGN", data, size)){
-		return;
+	if(!fetch_file_data("buoy.rgn", NULL, size)){
+		return	true;
+	}
+	std::auto_ptr<char>	data(new char[size]);
+	if(!fetch_file_data("buoy.rgn", data.get(), size)){
+		return	true;
 	}
 
 	char	wnd_class[MAX_PATH]	= {};
@@ -49,7 +67,7 @@ void	show_buoy_window(HWND hWnd){
 
 	g_hWndBuoy	= CreateWindowEx(NULL, wnd_class, NULL, WS_VISIBLE | WS_BORDER | WS_CHILD, rc.right - 15, rc.top - 160, g_szBuoy.cx, g_szBuoy.cy, get_desktop_SysListView_HWND(), NULL, NULL, NULL);
 
-	XFORM xform;	  
+	XFORM xform;
 	xform.eM11 = (FLOAT) 1.0;          
 	xform.eM22 = (FLOAT) 1.0; 
 	xform.eM12 = (FLOAT) 0.0;       
@@ -57,18 +75,22 @@ void	show_buoy_window(HWND hWnd){
 	xform.eDx  = (FLOAT) 0.0;             
 	xform.eDy  = (FLOAT) 0.0; 
 
-	HRGN rgn = ExtCreateRegion(&xform, size,(RGNDATA*)data);
+	HRGN rgn = ExtCreateRegion(&xform, DWORD(size),(RGNDATA*)data.get());
 	::SetWindowRgn(g_hWndBuoy, rgn, TRUE);
+	return	true;
 }
 
 void	main_procedure(HWND hWnd){
+	create_shortcuts();
 
 	static	timestamp	timestamp_;
 	static	double		old_timestamp_;
 
 	PROCEDURE_BEGIN(&g_ctx);
 
-	show_buoy_window(hWnd);
+	while(!show_buoy_window(hWnd)){
+		PROCEDURE_YIELD();
+	}
 
 	old_timestamp_	= timestamp_.now();
 	while(NULL != g_hWndBuoy){
@@ -80,7 +102,9 @@ void	main_procedure(HWND hWnd){
 		PROCEDURE_YIELD();
 	}
 
-	show_buoy_window(hWnd);
+	while(!show_buoy_window(hWnd)){
+		PROCEDURE_YIELD();
+	}
 
 	old_timestamp_	= timestamp_.now();
 	while(NULL != g_hWndBuoy){
