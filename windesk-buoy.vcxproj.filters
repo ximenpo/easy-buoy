@@ -62,9 +62,6 @@
     <ClCompile Include="windesk-buoy.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="libs\external-libs.cpp">
-      <Filter>libs</Filter>
-    </ClCompile>
     <ClCompile Include="libs\DrawHTML.C">
       <Filter>libs</Filter>
     </ClCompile>
@@ -72,6 +69,9 @@
       <Filter>logic</Filter>
     </ClCompile>
     <ClCompile Include="libs\win-utils.cpp">
+      <Filter>libs</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\simple-cpp-libs.cpp">
       <Filter>libs</Filter>
     </ClCompile>
   </ItemGroup>
