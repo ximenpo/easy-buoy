@@ -24,7 +24,7 @@
     <None Include="small.ico">
       <Filter>资源文件</Filter>
     </None>
-    <None Include="windesk-buoy.ico">
+    <None Include="easy-buoy.ico">
       <Filter>资源文件</Filter>
     </None>
     <None Include="COPY-RELEASES-TO-BIN.CMD" />
@@ -39,7 +39,7 @@
     <ClInclude Include="Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="windesk-buoy.h">
+    <ClInclude Include="easy-buoy.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="libs\BitmapHDC.h">
@@ -59,7 +59,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="windesk-buoy.cpp">
+    <ClCompile Include="easy-buoy.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="libs\DrawHTML.C">
@@ -76,7 +76,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="windesk-buoy.rc">
+    <ResourceCompile Include="easy-buoy.rc">
       <Filter>资源文件</Filter>
     </ResourceCompile>
   </ItemGroup>

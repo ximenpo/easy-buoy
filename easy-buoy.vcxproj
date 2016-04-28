@@ -154,7 +154,7 @@
   <ItemGroup>
     <None Include="COPY-RELEASES-TO-BIN.CMD" />
     <None Include="small.ico" />
-    <None Include="windesk-buoy.ico" />
+    <None Include="easy-buoy.ico" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libs\BitmapHDC.h" />
@@ -164,7 +164,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="windesk-buoy.h" />
+    <ClInclude Include="easy-buoy.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="libs\DrawHTML.C">
@@ -180,10 +180,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="windesk-buoy.cpp" />
+    <ClCompile Include="easy-buoy.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="windesk-buoy.rc" />
+    <ResourceCompile Include="easy-buoy.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

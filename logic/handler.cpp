@@ -118,7 +118,7 @@ void	main_procedure(HWND hWnd){
 
 void	handle_start_64bits_app(){
 	// TODO: 启动64位应用程序
-	ShellExecute(NULL, "open", (win_get_root_path() + "windesk-buoy.amd64.exe").c_str(), NULL, win_get_root_path().c_str(), SW_SHOW);
+	ShellExecute(NULL, "open", (win_get_root_path() + "easy-buoy.amd64.exe").c_str(), NULL, win_get_root_path().c_str(), SW_SHOW);
 }
 
 bool	handle_init_app(){

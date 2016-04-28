@@ -1,8 +1,8 @@
-// windesk-buoy.cpp : 定义应用程序的入口点。
+// easy-buoy.cpp : 定义应用程序的入口点。
 //
 
 #include "stdafx.h"
-#include "windesk-buoy.h"
+#include "easy-buoy.h"
 
 // locust: 方便消息处理
 #include	<WindowsX.h>
