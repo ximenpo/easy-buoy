@@ -21,6 +21,8 @@ private:
 static	GdiplusInitializer	s_gdiplus_initializer;
 //////////////////////////////////////////////////////////////////
 
+#include	"simple/string.h"
+
 static	Image*		g_img	= NULL;
 static	size_t		g_total_frames	= 0;
 static	double*		g_frame_elapse	= NULL;
@@ -40,7 +42,10 @@ bool	img_load(const char* file){
 		img_destroy();
 	}
 
-	g_img	= new Image(file);
+	wchar_t	fn[MAX_PATH]	= {};
+	string_utf8_to_wchar(file, strlen(file), fn, sizeof(fn));
+
+	g_img	= new Image(fn);
 
 	// fetch frames' count
 	{

@@ -74,6 +74,9 @@
     <ClCompile Include="libs\img-utils.cpp">
       <Filter>libs</Filter>
     </ClCompile>
+    <ClCompile Include="libs\simple-cpp-clibs.c">
+      <Filter>libs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="easy-buoy.rc">

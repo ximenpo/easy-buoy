@@ -168,6 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="libs\img-utils.cpp" />
+    <ClCompile Include="libs\simple-cpp-clibs.c" />
     <ClCompile Include="libs\simple-cpp-libs.cpp" />
     <ClCompile Include="libs\win-utils.cpp" />
     <ClCompile Include="logic\handler.cpp" />
