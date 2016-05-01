@@ -27,7 +27,7 @@
     <None Include="easy-buoy.ico">
       <Filter>资源文件</Filter>
     </None>
-    <None Include="COPY-RELEASES-TO-BIN.CMD" />
+    <None Include="copy-releases.cmd" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -45,13 +45,13 @@
     <ClInclude Include="libs\BitmapHDC.h">
       <Filter>libs</Filter>
     </ClInclude>
-    <ClInclude Include="libs\HtmlUtils.h">
-      <Filter>libs</Filter>
-    </ClInclude>
     <ClInclude Include="logic\handler.h">
       <Filter>logic</Filter>
     </ClInclude>
     <ClInclude Include="libs\win-utils.h">
+      <Filter>libs</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\img-util.h">
       <Filter>libs</Filter>
     </ClInclude>
   </ItemGroup>
@@ -62,9 +62,6 @@
     <ClCompile Include="easy-buoy.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="libs\DrawHTML.C">
-      <Filter>libs</Filter>
-    </ClCompile>
     <ClCompile Include="logic\handler.cpp">
       <Filter>logic</Filter>
     </ClCompile>
@@ -72,6 +69,9 @@
       <Filter>libs</Filter>
     </ClCompile>
     <ClCompile Include="libs\simple-cpp-libs.cpp">
+      <Filter>libs</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\img-utils.cpp">
       <Filter>libs</Filter>
     </ClCompile>
   </ItemGroup>

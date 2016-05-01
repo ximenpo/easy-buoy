@@ -3,7 +3,6 @@
 #include	<string>
 #include	<memory>
 
-//#include	<WindowsX.h>
 #include	<Shlwapi.h>
 #include	<ShellAPI.h>
 #include	<ShlObj.h>
@@ -14,7 +13,6 @@
 
 #include	"libs/win-utils.h"
 #include	"libs/BitmapHDC.h"
-#include	"libs/HtmlUtils.h"
 
 BitmapHDC	g_dcBuoy;
 SIZE		g_szBuoy	= {};

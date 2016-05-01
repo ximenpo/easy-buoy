@@ -152,13 +152,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="COPY-RELEASES-TO-BIN.CMD" />
+    <None Include="copy-releases.cmd" />
     <None Include="small.ico" />
     <None Include="easy-buoy.ico" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libs\BitmapHDC.h" />
-    <ClInclude Include="libs\HtmlUtils.h" />
+    <ClInclude Include="libs\img-util.h" />
     <ClInclude Include="libs\win-utils.h" />
     <ClInclude Include="logic\handler.h" />
     <ClInclude Include="Resource.h" />
@@ -167,10 +167,7 @@
     <ClInclude Include="easy-buoy.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="libs\DrawHTML.C">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
+    <ClCompile Include="libs\img-utils.cpp" />
     <ClCompile Include="libs\simple-cpp-libs.cpp" />
     <ClCompile Include="libs\win-utils.cpp" />
     <ClCompile Include="logic\handler.cpp" />
