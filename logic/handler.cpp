@@ -12,12 +12,11 @@
 #include	"simple/timestamp.h"
 
 #include	"libs/win-utils.h"
-#include	"libs/BitmapHDC.h"
 
-BitmapHDC	g_dcBuoy;
+#include	"img.h"
+
 SIZE		g_szBuoy	= {};
 HWND		g_hWndBuoy	= NULL;
-HBITMAP		g_hBitmap	= NULL;
 
 procedure_context	g_ctx;
 
@@ -40,14 +39,11 @@ bool	show_buoy_window(HWND hWnd){
 		return	false;
 	}
 
-	if(NULL == g_hBitmap){
-		g_hBitmap	= (HBITMAP)LoadImage(NULL, (win_get_root_path() + "buoy.bmp").c_str(),IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION|LR_DEFAULTSIZE|LR_LOADFROMFILE);
-	}
-	if(NULL == g_hBitmap){
+	if(!img_load((win_get_root_path() + "buoy.bmp").c_str())){
 		return	true;
 	}
 
-	if(!win_get_bitmap_size(g_hBitmap, g_szBuoy.cx, g_szBuoy.cy)){
+	if(!img_fetch_size(&g_szBuoy)){
 		return	true;
 	}
 	
@@ -135,24 +131,7 @@ bool	handle_init_app(){
 }
 
 void	handle_draw(HWND hWnd, HDC hdc){
-	if(hWnd != g_hWndBuoy){
-		return;
-	}
-
-	if(NULL == g_dcBuoy){
-		g_dcBuoy.Initialize(g_szBuoy.cx, g_szBuoy.cy, hdc, RGB(0,0,0));
-		if(NULL != g_hBitmap){
-			::SelectObject(g_dcBuoy, g_hBitmap);
-		}
-	}
-
-	//RECT	rc	= {0,0,100,100};
-	//ExtTextOut(dc, 0, 0, ETO_OPAQUE, &rc, NULL, 0, NULL);
-	//DrawHTML(dc, "<b>ÄãºÃ</b>, world", -1, &rc, DT_CENTER, 0);
-
-	if(NULL != g_dcBuoy){
-		BitBlt(hdc, 0, 0, g_szBuoy.cx, g_szBuoy.cy, g_dcBuoy, 1, 1, SRCCOPY);
-	}
+	img_render(hdc);
 }
 
 void	handle_click(HWND hWnd, int x, int y){
@@ -168,7 +147,8 @@ void	handle_click(HWND hWnd, int x, int y){
 	}
 
 	g_hWndBuoy	= NULL;
-	g_dcBuoy.UnInitialize();
+
+	img_destroy();
 
 	ShowWindow(hWnd, SW_HIDE);
 	DestroyWindow(hWnd);

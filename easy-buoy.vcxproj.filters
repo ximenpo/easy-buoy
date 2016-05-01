@@ -42,17 +42,14 @@
     <ClInclude Include="easy-buoy.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="libs\BitmapHDC.h">
-      <Filter>libs</Filter>
-    </ClInclude>
     <ClInclude Include="logic\handler.h">
       <Filter>logic</Filter>
     </ClInclude>
     <ClInclude Include="libs\win-utils.h">
       <Filter>libs</Filter>
     </ClInclude>
-    <ClInclude Include="libs\img-util.h">
-      <Filter>libs</Filter>
+    <ClInclude Include="logic\img.h">
+      <Filter>logic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -71,11 +68,11 @@
     <ClCompile Include="libs\simple-cpp-libs.cpp">
       <Filter>libs</Filter>
     </ClCompile>
-    <ClCompile Include="libs\img-utils.cpp">
-      <Filter>libs</Filter>
-    </ClCompile>
     <ClCompile Include="libs\simple-cpp-clibs.c">
       <Filter>libs</Filter>
+    </ClCompile>
+    <ClCompile Include="logic\img.cpp">
+      <Filter>logic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

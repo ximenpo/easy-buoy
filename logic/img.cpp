@@ -27,6 +27,16 @@ static	Image*		g_img	= NULL;
 static	size_t		g_total_frames	= 0;
 static	double*		g_frame_elapse	= NULL;
 
+bool	img_fetch_size(SIZE* sz){
+	if(NULL == g_img || NULL == sz){
+		return	false;
+	}
+
+	sz->cx	= (LONG)g_img->GetWidth();
+	sz->cy	= (LONG)g_img->GetHeight();
+	return	true;
+}
+
 void	img_destroy(){
 	delete	g_img;
 	g_img	= NULL;
@@ -78,11 +88,16 @@ bool	img_load(const char* file){
 	return	(g_total_frames >= 1);
 }
 
-bool	img_render(){
+bool	img_render(HDC hdc){
 	if(NULL == g_img){
 		return	false;
 	}
 
-	//g_img->SelectActiveFrame(&FrameDimensionTime,fcount++);
-	return	false;
+	// TODO: select current frame
+	g_img->SelectActiveFrame(&FrameDimensionTime, 0);
+
+	Graphics graphics(hdc);  
+    graphics.DrawImage(g_img, -1, -1, g_img->GetWidth(), g_img->GetHeight());
+
+	return	true;
 }
