@@ -51,6 +51,9 @@
     <ClInclude Include="logic\img.h">
       <Filter>logic</Filter>
     </ClInclude>
+    <ClInclude Include="libs\BitmapHDC.h">
+      <Filter>libs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

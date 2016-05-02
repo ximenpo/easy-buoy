@@ -11,12 +11,14 @@
 #include	"simple/procedure.h"
 #include	"simple/timestamp.h"
 
+#include	"libs/BitmapHDC.h"
 #include	"libs/win-utils.h"
 
 #include	"img.h"
 
 SIZE		g_szBuoy	= {};
 HWND		g_hWndBuoy	= NULL;
+BitmapHDC	g_MemDC;
 
 procedure_context	g_ctx;
 
@@ -131,7 +133,14 @@ bool	handle_init_app(){
 }
 
 void	handle_draw(HWND hWnd, HDC hdc){
-	img_render(hdc);
+	if(NULL == g_MemDC){
+		g_MemDC.Initialize(g_szBuoy.cx, g_szBuoy.cy, hdc, RGB(0,0,0));
+	}
+
+	if(NULL != g_MemDC){
+		img_render(g_MemDC);
+		BitBlt(hdc, 0, 0, g_szBuoy.cx, g_szBuoy.cy, g_MemDC, 1, 1, SRCCOPY);
+	}
 }
 
 void	handle_click(HWND hWnd, int x, int y){
@@ -147,6 +156,7 @@ void	handle_click(HWND hWnd, int x, int y){
 	}
 
 	g_hWndBuoy	= NULL;
+	g_MemDC.UnInitialize();
 
 	img_destroy();
 

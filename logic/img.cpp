@@ -97,7 +97,7 @@ bool	img_render(HDC hdc){
 	g_img->SelectActiveFrame(&FrameDimensionTime, 0);
 
 	Graphics graphics(hdc);  
-    graphics.DrawImage(g_img, -1, -1, g_img->GetWidth(), g_img->GetHeight());
+    graphics.DrawImage(g_img, 0, 0, g_img->GetWidth(), g_img->GetHeight());
 
 	return	true;
 }

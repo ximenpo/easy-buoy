@@ -157,6 +157,7 @@
     <None Include="easy-buoy.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="libs\BitmapHDC.h" />
     <ClInclude Include="libs\win-utils.h" />
     <ClInclude Include="logic\handler.h" />
     <ClInclude Include="logic\img.h" />
