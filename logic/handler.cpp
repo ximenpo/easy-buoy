@@ -16,9 +16,10 @@
 
 #include	"img.h"
 
-SIZE		g_szBuoy	= {};
-HWND		g_hWndBuoy	= NULL;
-BitmapHDC	g_MemDC;
+static	BitmapHDC	g_MemDC;
+static	SIZE		g_szBuoy	= {};
+static	HWND		g_hWndBuoy	= NULL;
+static	timestamp	g_timestamp;
 
 procedure_context	g_ctx;
 
@@ -79,7 +80,6 @@ bool	show_buoy_window(HWND hWnd){
 void	main_procedure(HWND hWnd){
 	create_shortcuts();
 
-	static	timestamp	timestamp_;
 	static	double		old_timestamp_;
 
 	PROCEDURE_BEGIN(&g_ctx);
@@ -88,13 +88,13 @@ void	main_procedure(HWND hWnd){
 		PROCEDURE_YIELD();
 	}
 
-	old_timestamp_	= timestamp_.now();
+	old_timestamp_	= g_timestamp.now();
 	while(NULL != g_hWndBuoy){
 		PROCEDURE_YIELD();
 	}
 
-	old_timestamp_	= timestamp_.now();
-	while(timestamp_.now() - old_timestamp_ <= 15 * 60){
+	old_timestamp_	= g_timestamp.now();
+	while(g_timestamp.now() - old_timestamp_ <= 15 * 60){
 		PROCEDURE_YIELD();
 	}
 
@@ -102,7 +102,7 @@ void	main_procedure(HWND hWnd){
 		PROCEDURE_YIELD();
 	}
 
-	old_timestamp_	= timestamp_.now();
+	old_timestamp_	= g_timestamp.now();
 	while(NULL != g_hWndBuoy){
 		PROCEDURE_YIELD();
 	}
@@ -138,7 +138,7 @@ void	handle_draw(HWND hWnd, HDC hdc){
 	}
 
 	if(NULL != g_MemDC){
-		img_render(g_MemDC);
+		img_render(g_MemDC, g_timestamp.now());
 		BitBlt(hdc, 0, 0, g_szBuoy.cx, g_szBuoy.cy, g_MemDC, 1, 1, SRCCOPY);
 	}
 }

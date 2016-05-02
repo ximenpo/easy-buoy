@@ -25,7 +25,8 @@ static	GdiplusInitializer	s_gdiplus_initializer;
 
 static	Image*		g_img	= NULL;
 static	size_t		g_total_frames	= 0;
-static	double*		g_frame_elapse	= NULL;
+static	long*		g_frame_elapse	= NULL;
+static	double		g_timestamp		= 0.0;
 
 bool	img_fetch_size(SIZE* sz){
 	if(NULL == g_img || NULL == sz){
@@ -76,10 +77,10 @@ bool	img_load(const char* file){
 		int size			= g_img->GetPropertyItemSize(PropertyTagFrameDelay);
 		PropertyItem* pItem	= (PropertyItem*)new char[size];
 		g_img->GetPropertyItem(PropertyTagFrameDelay, size, pItem);
-		g_frame_elapse	= new double[g_total_frames];
-		double	elapse	= 0.0;
+		g_frame_elapse	= new long[g_total_frames];
+		long	elapse	= 0;
 		for(size_t i = 0; i < g_total_frames; ++i){
-			elapse	+= ((long*)pItem->value)[i] * 10 / 1000.0;
+			elapse	+= ((long*)pItem->value)[i] * 10;
 			g_frame_elapse[i]	= elapse;
 		}
 		delete[] (char*)pItem;
@@ -88,13 +89,15 @@ bool	img_load(const char* file){
 	return	(g_total_frames >= 1);
 }
 
-bool	img_render(HDC hdc){
+bool	img_render(HDC hdc, double timestamp){
 	if(NULL == g_img){
 		return	false;
 	}
 
 	// TODO: select current frame
-	g_img->SelectActiveFrame(&FrameDimensionTime, 0);
+	if(g_total_frames > 1 && NULL != g_frame_elapse){
+		g_img->SelectActiveFrame(&FrameDimensionTime, 0);
+	}
 
 	Graphics graphics(hdc);  
     graphics.DrawImage(g_img, 0, 0, g_img->GetWidth(), g_img->GetHeight());
