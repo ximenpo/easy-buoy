@@ -153,6 +153,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="copy-releases.cmd" />
+    <None Include="copy-testdata.cmd" />
     <None Include="small.ico" />
     <None Include="easy-buoy.ico" />
   </ItemGroup>

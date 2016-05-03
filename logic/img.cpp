@@ -40,6 +40,10 @@ bool	img_fetch_size(SIZE* sz){
 	return	true;
 }
 
+bool	img_is_animation(){
+	return	g_frame_count > 1;
+}
+
 void	img_destroy(){
 	delete	g_img;
 	g_img	= NULL;

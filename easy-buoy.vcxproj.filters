@@ -28,6 +28,7 @@
       <Filter>资源文件</Filter>
     </None>
     <None Include="copy-releases.cmd" />
+    <None Include="copy-testdata.cmd" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">

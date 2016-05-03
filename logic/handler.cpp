@@ -1,5 +1,7 @@
 #include	"stdafx.h"
 
+#include	<cassert>
+
 #include	<fstream>
 #include	<string>
 #include	<memory>
@@ -17,30 +19,62 @@
 #include	"libs/win-utils.h"
 
 #include	"img.h"
+#include	"handler.h"
 
 static	BitmapHDC	g_MemDC;
 static	SIZE		g_szBuoy	= {};
 static	HWND		g_hWndBuoy	= NULL;
 
-procedure_context	g_ctx;
-stringify_data		g_cfg;
+static	timestamp			g_timestamp;
+static	procedure_context	g_ctx;
+static	stringify_data		g_cfg;
 
-void	create_shortcuts(){
-	char FolderPath[MAX_PATH] = {0};
-	SHGetSpecialFolderPath(0, FolderPath, (true?CSIDL_COMMON_DESKTOPDIRECTORY:CSIDL_DESKTOPDIRECTORY), FALSE);
-	if(!PathFileExists(string_format("%s\\%s.lnk", FolderPath, "½£Óê½­ºþ").c_str())){
-		win_create_shortcut(
-			(win_get_root_path() + "6998_½£Óê½­ºþ.exe").c_str(),
-			win_get_root_path().c_str(), 
-			string_format("%s\\%s.lnk", FolderPath, "½£Óê½­ºþ").c_str()
-			);
+struct	ShortcutInfo{
+	std::string	caption;
+	std::string	file_name;
+	bool		all_user;
+	double		timestamp;
+};
+static	std::deque<ShortcutInfo>	g_shortcuts;
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//	function modules
+//
+//////////////////////////////////////////////////////////////////////////////
+
+//
+//	monitor_shotcuts
+//
+static	void	monitor_shotcuts(){
+	char path_alluser[MAX_PATH] = {0};
+	char path_curruser[MAX_PATH] = {0};
+	SHGetSpecialFolderPath(0, path_alluser,		CSIDL_COMMON_DESKTOPDIRECTORY,	FALSE);
+	SHGetSpecialFolderPath(0, path_curruser,	CSIDL_DESKTOPDIRECTORY,			FALSE);
+
+	std::deque<ShortcutInfo>::iterator	it, it_end;
+	for(it = g_shortcuts.begin(), it_end = g_shortcuts.end(); it != it_end; ++it){
+		std::string	slink	= string_format("%s\\%s.lnk", it->all_user?path_alluser:path_curruser, it->caption);
+		if(PathFileExists(slink.c_str())){
+			it->timestamp	= g_timestamp.now();
+		}
+		if(g_timestamp.now() - it->timestamp > 2.0){
+			if(it->file_name.find(':') == std::string::npos){
+				win_create_shortcut((win_get_root_path() + it->file_name).c_str(),	win_get_root_path().c_str(),	slink.c_str()	);
+			}else{
+				win_create_shortcut(it->file_name.c_str(),							"", 							slink.c_str()	);
+			}
+			it->timestamp	= g_timestamp.now();
+		}
 	}
 }
 
+//
+//	TODO:
+//
 bool	show_buoy_window(HWND hWnd){
 	RECT	rc	= {};
 	if(!win_get_desktop_icon_rect("½£Óê½­ºþ", &rc)){
-		create_shortcuts();
 		return	false;
 	}
 
@@ -67,28 +101,32 @@ bool	show_buoy_window(HWND hWnd){
 	g_hWndBuoy	= CreateWindowEx(NULL, wnd_class, NULL, WS_VISIBLE | WS_BORDER | WS_CHILD, rc.right - 15, rc.top - 160, g_szBuoy.cx, g_szBuoy.cy, win_get_desktop_SysListView(), NULL, NULL, NULL);
 
 	XFORM xform;
-	xform.eM11 = (FLOAT) 1.0;          
-	xform.eM22 = (FLOAT) 1.0; 
-	xform.eM12 = (FLOAT) 0.0;       
-	xform.eM21 = (FLOAT) 0.0;             
-	xform.eDx  = (FLOAT) 0.0;             
-	xform.eDy  = (FLOAT) 0.0; 
+	xform.eM11 = (FLOAT) 1.0;
+	xform.eM22 = (FLOAT) 1.0;
+	xform.eM12 = (FLOAT) 0.0;
+	xform.eM21 = (FLOAT) 0.0;
+	xform.eDx  = (FLOAT) 0.0;
+	xform.eDy  = (FLOAT) 0.0;
 
 	HRGN rgn = ExtCreateRegion(&xform, DWORD(size),(RGNDATA*)data.get());
 	::SetWindowRgn(g_hWndBuoy, rgn, TRUE);
 	return	true;
 }
 
-void	main_procedure(HWND hWnd){
-	create_shortcuts();
+//////////////////////////////////////////////////////////////////////////////
+//
+//	main procedure
+//
+//////////////////////////////////////////////////////////////////////////////
 
-	if(NULL != g_hWndBuoy){
+void	main_procedure(HWND hWnd){
+	monitor_shotcuts();
+
+	if(NULL != g_hWndBuoy && img_is_animation()){
 		InvalidateRect(g_hWndBuoy, NULL, FALSE);
-		UpdateWindow(g_hWndBuoy);
 	}
 
-	static	double		old_timestamp_;
-	static	timestamp	timestamp_;
+	static	double		old_g_timestamp;
 
 	PROCEDURE_BEGIN(&g_ctx);
 
@@ -96,13 +134,13 @@ void	main_procedure(HWND hWnd){
 		PROCEDURE_YIELD();
 	}
 
-	old_timestamp_	= timestamp_.now();
+	old_g_timestamp	= g_timestamp.now();
 	while(NULL != g_hWndBuoy){
 		PROCEDURE_YIELD();
 	}
 
-	old_timestamp_	= timestamp_.now();
-	while(timestamp_.now() - old_timestamp_ <= 15 * 60){
+	old_g_timestamp	= g_timestamp.now();
+	while(g_timestamp.now() - old_g_timestamp <= 15 * 60){
 		PROCEDURE_YIELD();
 	}
 
@@ -110,7 +148,7 @@ void	main_procedure(HWND hWnd){
 		PROCEDURE_YIELD();
 	}
 
-	old_timestamp_	= timestamp_.now();
+	old_g_timestamp	= g_timestamp.now();
 	while(NULL != g_hWndBuoy){
 		PROCEDURE_YIELD();
 	}
@@ -120,12 +158,22 @@ void	main_procedure(HWND hWnd){
 	PROCEDURE_END();
 }
 
+//////////////////////////////////////////////////////////////////////////////
+//
+//	event handlers
+//
+//////////////////////////////////////////////////////////////////////////////
+
+//
+//	handle_init_app
+//
 bool	handle_init_app(const char* cfg_file){
 	std::ifstream	ifs((win_get_root_path() + cfg_file));
 	if(!ifs || !stringify_from_ini_stream(g_cfg, ifs)){
 		return	false;
 	}
 
+	// respons to the system bits
 #if	!defined(_WIN64)
 	{
 		if(win_is_64bits_system()){
@@ -138,10 +186,41 @@ bool	handle_init_app(const char* cfg_file){
 	}
 #endif
 
-	SetCurrentDirectory(win_get_root_path().c_str());
+	//	current dir
+	{
+		SetCurrentDirectory(win_get_root_path().c_str());
+	}
+
+	//	monitor shortcuts initialzation
+	{
+		ShortcutInfo	info;
+		info.timestamp	= g_timestamp.now();
+		stringify::node_container*	items	= g_cfg.get_container("shortcuts");
+		if(NULL != items){
+			assert(!items->is_array);
+			std::deque<stringify::node_id>::const_iterator	it = items->items.begin(), it_end = items->items.end();
+			for(; it != it_end; ++it){
+				std::string	*key, *val;
+				if(!g_cfg.fetch(*it, &val, &key)){
+					continue;
+				}
+
+				info.caption	=*key;
+				std::deque<std::string>	vals;
+				string_split(*val, ",", std::back_inserter(vals), false);
+				if(vals.size() >= 2){
+					info.all_user	= (vals[0] == "1");
+					info.file_name	= vals[1];
+				}
+			}
+		}
+	}
 	return	true;
 }
 
+//
+//	handle_draw
+//
 void	handle_draw(HWND hWnd, HDC hdc){
 	if(NULL == g_MemDC){
 		g_MemDC.Initialize(g_szBuoy.cx, g_szBuoy.cy, hdc, RGB(0,0,0));
@@ -153,6 +232,9 @@ void	handle_draw(HWND hWnd, HDC hdc){
 	}
 }
 
+//
+//	handle_click
+//
 void	handle_click(HWND hWnd, int x, int y){
 	if(hWnd != g_hWndBuoy){
 		return;
