@@ -50,11 +50,6 @@ struct	BuoyInfo{
 };
 static	BuoyInfo		g_buoyinfo	= {};
 
-class	BuoyCalculator	: public turing_calculator {
-};
-static	turing_machine	g_machine;
-static	BuoyCalculator	g_calculator;
-
 //////////////////////////////////////////////////////////////////////////////
 //
 //	function modules
@@ -100,6 +95,9 @@ static	void	monitor_shotcuts(){
 //	show buoy window
 //
 bool	show_buoy(const char* buoy_name){
+	if(NULL == buoy_name){
+		return	false;
+	}
 	stringify::node_container*	items	= g_cfg.get_container(buoy_name);
 	if(NULL == items){
 		return	false;
@@ -160,13 +158,51 @@ bool	show_buoy(const char* buoy_name){
 	return	true;
 }
 
+void	hide_buoy(){
+	PostMessage(g_hWndBuoy, WM_DESTROY, 0, 0);
+}
+
+bool	has_buoy(){
+	return	(NULL != g_hWndBuoy);
+}
+
+#define FX(FUNK,LEN,BIN,DO) if(!strncmp(buf,FUNK,LEN)) { move = LEN + fetch_func_params(buf+LEN,BIN,x,y); { DO; } }
+class	BuoyCalculator	: public turing_calculator {
+public:
+	double		resume_timestamp;
+protected:
+	variable	do_find_function(const char* buf, int& move) {
+		calculator::variable x,y;
+		switch (*buf) {
+		case 'H':
+			FX("HasBuoy(",		8,0, return has_buoy()?1.0:0.0;);
+			FX("HideBuoy(",		9,0, hide_buoy();return 1.0;);
+			break;
+		case 'S':
+			FX("ShowBuoy(",		9,1, show_buoy(get_str_variable(size_t(x)));return 1.0;);
+			break;
+		case 'W':
+			FX("Wait(",			5,1, {
+				if(get_matchine())get_matchine()->set_paused(true);
+				this->resume_timestamp	= g_timestamp.now() + x;
+				return 1.0;
+			});
+			break;
+		}
+		return	turing_calculator::do_find_function(buf, move);
+	}
+};
+#undef	FX
+static	turing_machine	g_machine;
+static	BuoyCalculator	g_calculator;
+
 //////////////////////////////////////////////////////////////////////////////
 //
 //	main procedure
 //
 //////////////////////////////////////////////////////////////////////////////
 
-void	main_procedure(HWND hWnd){
+bool	main_procedure(HWND hWnd){
 	// fetch window class
 	if(g_sWndClass.empty()){
 		char	wnd_class[MAX_PATH]	= {};
@@ -199,7 +235,15 @@ void	main_procedure(HWND hWnd){
 		}
 	}
 
-	//
+	if(g_machine.is_paused() && g_timestamp.now() > g_calculator.resume_timestamp){
+		g_machine.set_paused(false);
+	}
+	if(!g_machine.is_paused()){
+		g_machine.run(false);
+	}
+
+	return	!g_machine.is_started();
+/*
 	static	double		old_g_timestamp;
 
 	PROCEDURE_BEGIN(&g_ctx);
@@ -230,6 +274,7 @@ void	main_procedure(HWND hWnd){
 	KillTimer(hWnd, 100);
 	PostQuitMessage(0);
 	PROCEDURE_END();
+*/
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -296,8 +341,8 @@ bool	handle_init_app(const char* cfg_file){
 
 	// virtual machine
 	{
-        g_machine.instruction_executor = bind(&turing_calculator::execute_instruction, &g_calculator);
-        g_machine.start();
+		g_machine.instruction_executor = bind(&turing_calculator::execute_instruction, &g_calculator);
+		g_machine.start();
 	}
 	return	true;
 }

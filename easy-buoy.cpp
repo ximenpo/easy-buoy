@@ -177,7 +177,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		switch (message)
 		{
-		case WM_TIMER:		main_procedure(hWnd);		break;
+		case WM_TIMER:{
+			if(main_procedure(hWnd)){
+				KillTimer(hWnd, 100);
+				PostQuitMessage(0);
+			}
+					  }break;
 		}
 	}
 
