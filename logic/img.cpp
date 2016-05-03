@@ -60,7 +60,7 @@ bool	img_load(const char* file){
 	}
 
 	wchar_t	fn[MAX_PATH]	= {};
-	string_utf8_to_wchar(file, strlen(file), fn, sizeof(fn));
+	::MultiByteToWideChar(CP_ACP, NULL, file, int(strlen(file)), fn, MAX_PATH);
 
 	g_img	= new Image(fn);
 

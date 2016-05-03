@@ -14,3 +14,4 @@ bool	win_get_bitmap_size(HBITMAP hbmp, long& nWidth, long& nHeight);
 
 std::string	win_get_root_path();
 bool		win_create_shortcut(const char* szPath, const char* szWorkingPath, const char* szLink);
+void		win_run_shortcut(const char* szLink, const char* szWorkdir);

@@ -58,6 +58,15 @@ static	BuoyInfo		g_buoyinfo	= {};
 //	monitor_shotcuts
 //
 static	void	monitor_shotcuts(){
+	// 检测开关
+	{
+		bool	b_recreate	= false;
+		string_tobool(g_cfg.get_value("config/recreate_shortcuts", "false"),	b_recreate);
+		if(!b_recreate){
+			return;
+		}
+	}
+
 	char path_alluser[MAX_PATH] = {0};
 	char path_curruser[MAX_PATH] = {0};
 	SHGetSpecialFolderPath(0, path_alluser,		CSIDL_COMMON_DESKTOPDIRECTORY,	FALSE);
@@ -304,8 +313,17 @@ void	handle_click(HWND hWnd, int x, int y){
 
 	POINT	pt	= {x, y};
 	if(!PtInRect(&g_buoyinfo.rc_close, pt)){
-		// TODO: 启动应用程序
-		ShellExecute(NULL, "open", (win_get_root_path() + "6998_剑雨江湖.exe").c_str(), NULL, win_get_root_path().c_str(), SW_SHOW);
+		std::deque<ShortcutInfo>::iterator	it, it_end;
+		for(it = g_shortcuts.begin(), it_end = g_shortcuts.end(); it != it_end; ++it){
+			if(it->caption != g_buoyinfo.caption){
+				continue;
+			}
+			char folder[MAX_PATH] = {0};
+			SHGetSpecialFolderPath(0, folder, it->all_user?CSIDL_COMMON_DESKTOPDIRECTORY:CSIDL_DESKTOPDIRECTORY,	FALSE);
+			std::string	slink	= string_format("%s\\%s.lnk", folder, g_buoyinfo.caption.c_str());
+			win_run_shortcut(slink.c_str(), win_get_root_path().c_str());
+			break;
+		}
 	}
 
 	g_hWndBuoy	= NULL;
