@@ -24,6 +24,7 @@
 static	BitmapHDC	g_MemDC;
 static	SIZE		g_szBuoy	= {};
 static	HWND		g_hWndBuoy	= NULL;
+static	std::string	g_sWndClass;
 
 static	timestamp			g_timestamp;
 static	procedure_context	g_ctx;
@@ -36,6 +37,16 @@ struct	ShortcutInfo{
 	double		timestamp;
 };
 static	std::deque<ShortcutInfo>	g_shortcuts;
+
+struct	BuoyInfo{
+	bool		valid;
+	std::string	caption;
+	std::string	img_file;
+	std::string	rgn_file;
+	RECT		rc_close;
+	SIZE		offset;
+};
+static	BuoyInfo		g_buoyinfo	= {};
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -70,35 +81,56 @@ static	void	monitor_shotcuts(){
 }
 
 //
-//	TODO:
+//	TODO:	show buoy window
 //
-bool	show_buoy_window(HWND hWnd){
-	RECT	rc	= {};
-	if(!win_get_desktop_icon_rect("½£Óê½­ºþ", &rc)){
+bool	show_buoy(const char* buoy_name){
+	stringify::node_container*	items	= g_cfg.get_container(buoy_name);
+	if(NULL == items){
 		return	false;
 	}
 
-	if(!img_load((win_get_root_path() + "buoy.bmp").c_str())){
-		return	true;
+	// fetch buoy info
+	{
+		memset(&g_buoyinfo, 0, sizeof(g_buoyinfo));
+		g_buoyinfo.caption	= g_cfg.get_value(buoy_name, "caption", "");
+		g_buoyinfo.img_file	= g_cfg.get_value(buoy_name, "img",		"");
+		g_buoyinfo.rgn_file	= g_cfg.get_value(buoy_name, "rgn",		"");
+		string_tonumbers(g_cfg.get_value(buoy_name, "offset", "0,0"),			g_buoyinfo.offset.cx, g_buoyinfo.offset.cy);
+		string_tonumbers(g_cfg.get_value(buoy_name, "close_rect", "0,0,0,0"),	g_buoyinfo.rc_close.left, g_buoyinfo.rc_close.top, g_buoyinfo.rc_close.right, g_buoyinfo.rc_close.bottom);
 	}
 
-	if(!img_fetch_size(&g_szBuoy)){
+	RECT	rc	= {};
+	if(!win_get_desktop_icon_rect(g_buoyinfo.caption.c_str(), &rc)){
+		return	false;
+	}
+
+	if(!img_load(g_buoyinfo.img_file.c_str()) || !img_fetch_size(&g_szBuoy)){
 		return	true;
 	}
 
 	size_t	size	= 0;
-	if(!win_load_file_data("buoy.rgn", NULL, size)){
+	if(!win_load_file_data(g_buoyinfo.rgn_file.c_str(), NULL, size)){
 		return	true;
 	}
 	std::auto_ptr<char>	data(new char[size]);
-	if(!win_load_file_data("buoy.rgn", data.get(), size)){
+	if(!win_load_file_data(g_buoyinfo.rgn_file.c_str(), data.get(), size)){
 		return	true;
 	}
 
-	char	wnd_class[MAX_PATH]	= {};
-	GetClassName(hWnd, wnd_class, sizeof(wnd_class) - 1);
-
-	g_hWndBuoy	= CreateWindowEx(NULL, wnd_class, NULL, WS_VISIBLE | WS_BORDER | WS_CHILD, rc.right - 15, rc.top - 160, g_szBuoy.cx, g_szBuoy.cy, win_get_desktop_SysListView(), NULL, NULL, NULL);
+	g_hWndBuoy	= CreateWindowEx(
+		NULL, 
+		g_sWndClass.c_str(), 
+		NULL, 
+		WS_VISIBLE | WS_BORDER | WS_CHILD, 
+		rc.right + g_buoyinfo.offset.cx, 
+		rc.top + g_buoyinfo.offset.cy, 
+		g_szBuoy.cx, 
+		g_szBuoy.cy, 
+		win_get_desktop_SysListView(), 
+		NULL, 
+		NULL, 
+		NULL
+		);
 
 	XFORM xform;
 	xform.eM11 = (FLOAT) 1.0;
@@ -120,17 +152,27 @@ bool	show_buoy_window(HWND hWnd){
 //////////////////////////////////////////////////////////////////////////////
 
 void	main_procedure(HWND hWnd){
+	// fetch window class
+	if(g_sWndClass.empty()){
+		char	wnd_class[MAX_PATH]	= {};
+		GetClassName(hWnd, wnd_class, sizeof(wnd_class) - 1);
+		g_sWndClass	= wnd_class;
+	}
+
+	// handle shortcuts
 	monitor_shotcuts();
 
+	// refresh buoy window
 	if(NULL != g_hWndBuoy && img_is_animation()){
 		InvalidateRect(g_hWndBuoy, NULL, FALSE);
 	}
 
+	//
 	static	double		old_g_timestamp;
 
 	PROCEDURE_BEGIN(&g_ctx);
 
-	while(!show_buoy_window(hWnd)){
+	while(!show_buoy("½£Óê½­ºþ")){
 		PROCEDURE_YIELD();
 	}
 
@@ -144,7 +186,7 @@ void	main_procedure(HWND hWnd){
 		PROCEDURE_YIELD();
 	}
 
-	while(!show_buoy_window(hWnd)){
+	while(!show_buoy("½£Óê½­ºþ")){
 		PROCEDURE_YIELD();
 	}
 
@@ -240,13 +282,12 @@ void	handle_draw(HWND hWnd, HDC hdc){
 //	handle_click
 //
 void	handle_click(HWND hWnd, int x, int y){
-	if(hWnd != g_hWndBuoy){
+	if(hWnd != g_hWndBuoy || !g_buoyinfo.valid){
 		return;
 	}
 
-	RECT	rc	= {282, 137, 293, 148};
 	POINT	pt	= {x, y};
-	if(!PtInRect(&rc, pt)){
+	if(!PtInRect(&g_buoyinfo.rc_close, pt)){
 		// TODO: Æô¶¯Ó¦ÓÃ³ÌÐò
 		ShellExecute(NULL, "open", (win_get_root_path() + "6998_½£Óê½­ºþ.exe").c_str(), NULL, win_get_root_path().c_str(), SW_SHOW);
 	}
