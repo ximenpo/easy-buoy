@@ -11,9 +11,11 @@
 #include	<ShlObj.h>
 
 #include	"simple/string.h"
+#include	"simple/string.h"
 #include	"simple/procedure.h"
 #include	"simple/timestamp.h"
 #include	"simple/stringify.h"
+#include	"simple/turing_calculator.h"
 
 #include	"libs/BitmapHDC.h"
 #include	"libs/win-utils.h"
@@ -47,6 +49,11 @@ struct	BuoyInfo{
 	RECT		rc_icon;
 };
 static	BuoyInfo		g_buoyinfo	= {};
+
+class	BuoyCalculator	: public turing_calculator {
+};
+static	turing_machine	g_machine;
+static	BuoyCalculator	g_calculator;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -258,7 +265,7 @@ bool	handle_init_app(const char* cfg_file){
 		SetCurrentDirectory(win_get_root_path().c_str());
 	}
 
-	//	monitor shortcuts initialzation
+	//	shortcuts initialzation
 	{
 		ShortcutInfo	info;
 		info.timestamp	= g_timestamp.now();
@@ -285,6 +292,12 @@ bool	handle_init_app(const char* cfg_file){
 				g_shortcuts.push_back(info);
 			}
 		}
+	}
+
+	// virtual machine
+	{
+        g_machine.instruction_executor = bind(&turing_calculator::execute_instruction, &g_calculator);
+        g_machine.start();
 	}
 	return	true;
 }
