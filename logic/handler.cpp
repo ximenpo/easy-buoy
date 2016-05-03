@@ -39,12 +39,12 @@ struct	ShortcutInfo{
 static	std::deque<ShortcutInfo>	g_shortcuts;
 
 struct	BuoyInfo{
-	bool		valid;
 	std::string	caption;
 	std::string	img_file;
 	std::string	rgn_file;
 	RECT		rc_close;
 	SIZE		offset;
+	RECT		rc_icon;
 };
 static	BuoyInfo		g_buoyinfo	= {};
 
@@ -81,7 +81,7 @@ static	void	monitor_shotcuts(){
 }
 
 //
-//	TODO:	show buoy window
+//	show buoy window
 //
 bool	show_buoy(const char* buoy_name){
 	stringify::node_container*	items	= g_cfg.get_container(buoy_name);
@@ -91,7 +91,6 @@ bool	show_buoy(const char* buoy_name){
 
 	// fetch buoy info
 	{
-		memset(&g_buoyinfo, 0, sizeof(g_buoyinfo));
 		g_buoyinfo.caption	= g_cfg.get_value(buoy_name, "caption", "");
 		g_buoyinfo.img_file	= g_cfg.get_value(buoy_name, "img",		"");
 		g_buoyinfo.rgn_file	= g_cfg.get_value(buoy_name, "rgn",		"");
@@ -99,8 +98,7 @@ bool	show_buoy(const char* buoy_name){
 		string_tonumbers(g_cfg.get_value(buoy_name, "close_rect", "0,0,0,0"),	g_buoyinfo.rc_close.left, g_buoyinfo.rc_close.top, g_buoyinfo.rc_close.right, g_buoyinfo.rc_close.bottom);
 	}
 
-	RECT	rc	= {};
-	if(!win_get_desktop_icon_rect(g_buoyinfo.caption.c_str(), &rc)){
+	if(!win_get_desktop_icon_rect(g_buoyinfo.caption.c_str(), &g_buoyinfo.rc_icon)){
 		return	false;
 	}
 
@@ -121,9 +119,9 @@ bool	show_buoy(const char* buoy_name){
 		NULL, 
 		g_sWndClass.c_str(), 
 		NULL, 
-		WS_VISIBLE | WS_BORDER | WS_CHILD, 
-		rc.right + g_buoyinfo.offset.cx, 
-		rc.top + g_buoyinfo.offset.cy, 
+		WS_VISIBLE | WS_CHILD, 
+		g_buoyinfo.rc_icon.right + g_buoyinfo.offset.cx, 
+		g_buoyinfo.rc_icon.top + g_buoyinfo.offset.cy, 
 		g_szBuoy.cx, 
 		g_szBuoy.cy, 
 		win_get_desktop_SysListView(), 
@@ -142,6 +140,7 @@ bool	show_buoy(const char* buoy_name){
 
 	HRGN rgn = ExtCreateRegion(&xform, DWORD(size),(RGNDATA*)data.get());
 	::SetWindowRgn(g_hWndBuoy, rgn, TRUE);
+
 	return	true;
 }
 
@@ -163,8 +162,25 @@ void	main_procedure(HWND hWnd){
 	monitor_shotcuts();
 
 	// refresh buoy window
-	if(NULL != g_hWndBuoy && img_is_animation()){
-		InvalidateRect(g_hWndBuoy, NULL, FALSE);
+	if(NULL != g_hWndBuoy){
+		RECT	rc;
+		if(win_get_desktop_icon_rect(g_buoyinfo.caption.c_str(), &rc) && 0 != memcmp(&rc, &g_buoyinfo.rc_icon, sizeof(rc))){
+			g_buoyinfo.rc_icon	= rc;
+			MoveWindow(
+				g_hWndBuoy,
+				g_buoyinfo.rc_icon.right + g_buoyinfo.offset.cx, 
+				g_buoyinfo.rc_icon.top + g_buoyinfo.offset.cy, 
+				g_szBuoy.cx, 
+				g_szBuoy.cy,
+				TRUE
+				);
+		}
+		if(img_is_animation()){
+			InvalidateRect(g_hWndBuoy, NULL, FALSE);
+		}
+		if(img_is_animation()){
+			InvalidateRect(g_hWndBuoy, NULL, FALSE);
+		}
 	}
 
 	//
@@ -274,7 +290,7 @@ void	handle_draw(HWND hWnd, HDC hdc){
 
 	if(NULL != g_MemDC){
 		img_render(g_MemDC);
-		BitBlt(hdc, 0, 0, g_szBuoy.cx, g_szBuoy.cy, g_MemDC, 1, 1, SRCCOPY);
+		BitBlt(hdc, 0, 0, g_szBuoy.cx, g_szBuoy.cy, g_MemDC, 0, 0, SRCCOPY);
 	}
 }
 
@@ -282,7 +298,7 @@ void	handle_draw(HWND hWnd, HDC hdc){
 //	handle_click
 //
 void	handle_click(HWND hWnd, int x, int y){
-	if(hWnd != g_hWndBuoy || !g_buoyinfo.valid){
+	if(hWnd != g_hWndBuoy){
 		return;
 	}
 
