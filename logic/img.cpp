@@ -1,5 +1,8 @@
 #include	"stdafx.h"
 
+#include	<algorithm>
+#include	"simple/timestamp.h"
+
 #include	<GdiPlus.h>
 #pragma		comment(lib, "Gdiplus.lib")
 using namespace Gdiplus;
@@ -24,9 +27,8 @@ static	GdiplusInitializer	s_gdiplus_initializer;
 #include	"simple/string.h"
 
 static	Image*		g_img	= NULL;
-static	size_t		g_total_frames	= 0;
-static	long*		g_frame_elapse	= NULL;
-static	double		g_timestamp		= 0.0;
+static	size_t		g_frame_count	= 0;
+static	double*		g_frame_elapse	= NULL;
 
 bool	img_fetch_size(SIZE* sz){
 	if(NULL == g_img || NULL == sz){
@@ -45,7 +47,7 @@ void	img_destroy(){
 	delete	g_frame_elapse;
 	g_frame_elapse	= NULL;
 
-	g_total_frames	= 0;
+	g_frame_count	= 0;
 }
 
 bool	img_load(const char* file){
@@ -68,25 +70,25 @@ bool	img_load(const char* file){
 		
 		GUID *pDimensionIDs	= (GUID*)new GUID[dim_count];
 		g_img->GetFrameDimensionsList(pDimensionIDs, dim_count);
-		g_total_frames	= g_img->GetFrameCount(&pDimensionIDs[0]);
+		g_frame_count	= g_img->GetFrameCount(&pDimensionIDs[0]);
 		delete []pDimensionIDs;
 	}
 
 	// frame elapse
-	if(g_total_frames > 1){
+	if(g_frame_count > 1){
 		int size			= g_img->GetPropertyItemSize(PropertyTagFrameDelay);
 		PropertyItem* pItem	= (PropertyItem*)new char[size];
 		g_img->GetPropertyItem(PropertyTagFrameDelay, size, pItem);
-		g_frame_elapse	= new long[g_total_frames];
-		long	elapse	= 0;
-		for(size_t i = 0; i < g_total_frames; ++i){
-			elapse	+= ((long*)pItem->value)[i] * 10;
+		g_frame_elapse	= new double[g_frame_count];
+		double	elapse	= 0;
+		for(size_t i = 0; i < g_frame_count; ++i){
+			elapse	+= ((long*)pItem->value)[i] * 10 / 1000.0;
 			g_frame_elapse[i]	= elapse;
 		}
 		delete[] (char*)pItem;
 	}
 	
-	return	(g_total_frames >= 1);
+	return	(g_frame_count >= 1);
 }
 
 bool	img_render(HDC hdc){
@@ -94,9 +96,14 @@ bool	img_render(HDC hdc){
 		return	false;
 	}
 
-	// TODO: select current frame
-	if(g_total_frames > 1){
-		g_img->SelectActiveFrame(&FrameDimensionTime, 0);
+	// select current frame
+	if(g_frame_count > 1){
+		static	timestamp	g_timestamp;
+		double*	pframe	= std::lower_bound(g_frame_elapse, g_frame_elapse + g_frame_count, g_timestamp.now());
+		g_img->SelectActiveFrame(&FrameDimensionTime, UINT(pframe - g_frame_elapse));
+		if(g_timestamp.now() >= g_frame_elapse[g_frame_count - 1]){
+			g_timestamp.reset();
+		}
 	}
 
 	Graphics graphics(hdc);  

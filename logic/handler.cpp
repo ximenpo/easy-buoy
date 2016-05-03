@@ -79,6 +79,11 @@ bool	show_buoy_window(HWND hWnd){
 void	main_procedure(HWND hWnd){
 	create_shortcuts();
 
+	if(NULL != g_hWndBuoy){
+		InvalidateRect(g_hWndBuoy, NULL, FALSE);
+		UpdateWindow(g_hWndBuoy);
+	}
+
 	static	double		old_timestamp_;
 	static	timestamp	timestamp_;
 
@@ -138,7 +143,6 @@ void	handle_draw(HWND hWnd, HDC hdc){
 	}
 
 	if(NULL != g_MemDC){
-		//img_render(hdc);
 		img_render(g_MemDC);
 		BitBlt(hdc, 0, 0, g_szBuoy.cx, g_szBuoy.cy, g_MemDC, 1, 1, SRCCOPY);
 	}

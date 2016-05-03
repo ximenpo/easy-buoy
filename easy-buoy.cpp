@@ -146,7 +146,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	// locust: start timer
 	{
 		g_hWnd	= hWnd;
-		SetTimer(hWnd, 100, 500, NULL);
+		SetTimer(hWnd, 100, 20, NULL);
 	}
 
 	return TRUE;
