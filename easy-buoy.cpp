@@ -34,7 +34,9 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	// locust: 初始化应用程序
 	{
-		if(!handle_init_app()){
+		TCHAR szCfgFile[MAX_LOADSTRING];
+		LoadString(hInstance, IDS_CONFIG_FILE, szCfgFile, MAX_LOADSTRING);
+		if(!handle_init_app(__argc >= 2 ? __argv[1] : szCfgFile)){
 			return	FALSE;
 		}
 	}

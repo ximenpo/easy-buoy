@@ -1,5 +1,6 @@
 #include	"stdafx.h"
 
+#include	<fstream>
 #include	<string>
 #include	<memory>
 
@@ -10,6 +11,7 @@
 #include	"simple/string.h"
 #include	"simple/procedure.h"
 #include	"simple/timestamp.h"
+#include	"simple/stringify.h"
 
 #include	"libs/BitmapHDC.h"
 #include	"libs/win-utils.h"
@@ -21,6 +23,7 @@ static	SIZE		g_szBuoy	= {};
 static	HWND		g_hWndBuoy	= NULL;
 
 procedure_context	g_ctx;
+stringify_data		g_cfg;
 
 void	create_shortcuts(){
 	char FolderPath[MAX_PATH] = {0};
@@ -117,17 +120,19 @@ void	main_procedure(HWND hWnd){
 	PROCEDURE_END();
 }
 
-void	handle_start_64bits_app(){
-	// TODO: 启动64位应用程序
-	ShellExecute(NULL, "open", (win_get_root_path() + "easy-buoy.amd64.exe").c_str(), NULL, win_get_root_path().c_str(), SW_SHOW);
-}
+bool	handle_init_app(const char* cfg_file){
+	std::ifstream	ifs((win_get_root_path() + cfg_file));
+	if(!ifs || !stringify_from_ini_stream(g_cfg, ifs)){
+		return	false;
+	}
 
-bool	handle_init_app(){
-	// locust: 根据系统启动对应的程序
 #if	!defined(_WIN64)
 	{
 		if(win_is_64bits_system()){
-			handle_start_64bits_app();
+			std::string	sApp	= g_cfg.get_value("config/app_64bits", "");
+			if(!sApp.empty()){
+				ShellExecute(NULL, "open", (win_get_root_path() + sApp).c_str(), NULL, win_get_root_path().c_str(), SW_SHOW);
+			}
 			return	false;
 		}
 	}
