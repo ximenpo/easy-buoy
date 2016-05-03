@@ -54,7 +54,7 @@ static	void	monitor_shotcuts(){
 
 	std::deque<ShortcutInfo>::iterator	it, it_end;
 	for(it = g_shortcuts.begin(), it_end = g_shortcuts.end(); it != it_end; ++it){
-		std::string	slink	= string_format("%s\\%s.lnk", it->all_user?path_alluser:path_curruser, it->caption);
+		std::string	slink	= string_format("%s\\%s.lnk", it->all_user?path_alluser:path_curruser, it->caption.c_str());
 		if(PathFileExists(slink.c_str())){
 			it->timestamp	= g_timestamp.now();
 		}
@@ -85,7 +85,7 @@ bool	show_buoy_window(HWND hWnd){
 	if(!img_fetch_size(&g_szBuoy)){
 		return	true;
 	}
-	
+
 	size_t	size	= 0;
 	if(!win_load_file_data("buoy.rgn", NULL, size)){
 		return	true;
@@ -208,10 +208,14 @@ bool	handle_init_app(const char* cfg_file){
 				info.caption	=*key;
 				std::deque<std::string>	vals;
 				string_split(*val, ",", std::back_inserter(vals), false);
-				if(vals.size() >= 2){
-					info.all_user	= (vals[0] == "1");
-					info.file_name	= vals[1];
+				if(vals.size() < 2){
+					continue;
 				}
+
+				info.all_user	= (vals[0] == "1");
+				info.file_name	= vals[1];
+
+				g_shortcuts.push_back(info);
 			}
 		}
 	}
