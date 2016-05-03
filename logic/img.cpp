@@ -89,13 +89,13 @@ bool	img_load(const char* file){
 	return	(g_total_frames >= 1);
 }
 
-bool	img_render(HDC hdc, double timestamp){
+bool	img_render(HDC hdc){
 	if(NULL == g_img){
 		return	false;
 	}
 
 	// TODO: select current frame
-	if(g_total_frames > 1 && NULL != g_frame_elapse){
+	if(g_total_frames > 1){
 		g_img->SelectActiveFrame(&FrameDimensionTime, 0);
 	}
 

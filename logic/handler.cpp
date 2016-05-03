@@ -19,7 +19,6 @@
 static	BitmapHDC	g_MemDC;
 static	SIZE		g_szBuoy	= {};
 static	HWND		g_hWndBuoy	= NULL;
-static	timestamp	g_timestamp;
 
 procedure_context	g_ctx;
 
@@ -81,6 +80,7 @@ void	main_procedure(HWND hWnd){
 	create_shortcuts();
 
 	static	double		old_timestamp_;
+	static	timestamp	timestamp_;
 
 	PROCEDURE_BEGIN(&g_ctx);
 
@@ -88,13 +88,13 @@ void	main_procedure(HWND hWnd){
 		PROCEDURE_YIELD();
 	}
 
-	old_timestamp_	= g_timestamp.now();
+	old_timestamp_	= timestamp_.now();
 	while(NULL != g_hWndBuoy){
 		PROCEDURE_YIELD();
 	}
 
-	old_timestamp_	= g_timestamp.now();
-	while(g_timestamp.now() - old_timestamp_ <= 15 * 60){
+	old_timestamp_	= timestamp_.now();
+	while(timestamp_.now() - old_timestamp_ <= 15 * 60){
 		PROCEDURE_YIELD();
 	}
 
@@ -102,7 +102,7 @@ void	main_procedure(HWND hWnd){
 		PROCEDURE_YIELD();
 	}
 
-	old_timestamp_	= g_timestamp.now();
+	old_timestamp_	= timestamp_.now();
 	while(NULL != g_hWndBuoy){
 		PROCEDURE_YIELD();
 	}
@@ -138,7 +138,8 @@ void	handle_draw(HWND hWnd, HDC hdc){
 	}
 
 	if(NULL != g_MemDC){
-		img_render(g_MemDC, g_timestamp.now());
+		//img_render(hdc);
+		img_render(g_MemDC);
 		BitBlt(hdc, 0, 0, g_szBuoy.cx, g_szBuoy.cy, g_MemDC, 1, 1, SRCCOPY);
 	}
 }

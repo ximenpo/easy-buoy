@@ -184,7 +184,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
 		// locust: »æÍ¼µÄ´¦Àí
-		if(hWnd != g_hWnd){
+		if(hWnd != g_hWnd && NULL != g_hWnd){
 			handle_draw(hWnd, hdc);
 		}
 		EndPaint(hWnd, &ps);
