@@ -1,0 +1,58 @@
+#TITLE=Turing_Calculator
+
+#DELIMITER=,(){}[]-+*%/="'~!&|<>?:;.#@
+#LINECOMMENT=#
+#NESTED_COMMENT=n
+#CASE=y
+#AUTOCASE=y
+#NUMBER_PATTERN=cpp
+#PREFIX2=@
+#PREFIX4=:
+
+#KEYWORD=Turing calculator
+;logic
+AND
+OR
+NOT
+;comapre
+EQ
+GT
+LT
+;flow control
+GOTO
+GOTO_IF
+YIELD
+STOP
+
+#KEYWORD=basic calculator
+;constant
+PI
+pi
+E
+;basic function
+abs
+asin
+acos
+atan
+cos
+cosh
+exp
+int
+ln
+log
+max
+min
+pow
+sqr
+sin
+sqrn
+sinh
+tan
+tanh
+!
+
+#KEYWORD=third functions
+ShowBuoy
+HideBuoy
+HasBuoy
+Wait
