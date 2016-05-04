@@ -1,0 +1,7 @@
+@game	=½£Óê½­ºþ
+:begin
+ShowBuoy(@game)
+Wait(10)
+HideBuoy()
+:end
+STOP

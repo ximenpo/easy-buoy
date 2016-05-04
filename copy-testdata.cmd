@@ -1,7 +1,7 @@
 @echo off
 @pushd	%~dp0
 
-@FOR	%%F	IN (easy-buoy.ini buoy.bmp buoy.gif buoy.rgn) DO (
+@FOR	%%F	IN (easy-buoy.ini easy-buoy.dat buoy.bmp buoy.gif buoy.rgn) DO (
 	@COPY	/Y	bin\%%F	Debug\
 	@IF	NOT	ERRORLEVEL		0			@PAUSE
 	@COPY	/Y	bin\%%F	Release\

@@ -3,6 +3,7 @@
 #include	<cassert>
 
 #include	<fstream>
+#include	<iterator>
 #include	<string>
 #include	<memory>
 
@@ -11,8 +12,6 @@
 #include	<ShlObj.h>
 
 #include	"simple/string.h"
-#include	"simple/string.h"
-#include	"simple/procedure.h"
 #include	"simple/timestamp.h"
 #include	"simple/stringify.h"
 #include	"simple/turing_calculator.h"
@@ -29,7 +28,6 @@ static	HWND		g_hWndBuoy	= NULL;
 static	std::string	g_sWndClass;
 
 static	timestamp			g_timestamp;
-static	procedure_context	g_ctx;
 static	stringify_data		g_cfg;
 
 struct	ShortcutInfo{
@@ -193,8 +191,9 @@ protected:
 	}
 };
 #undef	FX
-static	turing_machine	g_machine;
-static	BuoyCalculator	g_calculator;
+static	turing_machine			g_machine;
+static	BuoyCalculator			g_calculator;
+static	std::deque<string_line>	g_instructions;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -243,38 +242,38 @@ bool	main_procedure(HWND hWnd){
 	}
 
 	return	!g_machine.is_started();
-/*
+	/*
 	static	double		old_g_timestamp;
 
 	PROCEDURE_BEGIN(&g_ctx);
 
 	while(!show_buoy("½£Óê½­ºþ")){
-		PROCEDURE_YIELD();
+	PROCEDURE_YIELD();
 	}
 
 	old_g_timestamp	= g_timestamp.now();
 	while(NULL != g_hWndBuoy){
-		PROCEDURE_YIELD();
+	PROCEDURE_YIELD();
 	}
 
 	old_g_timestamp	= g_timestamp.now();
 	while(g_timestamp.now() - old_g_timestamp <= 15 * 60){
-		PROCEDURE_YIELD();
+	PROCEDURE_YIELD();
 	}
 
 	while(!show_buoy("½£Óê½­ºþ")){
-		PROCEDURE_YIELD();
+	PROCEDURE_YIELD();
 	}
 
 	old_g_timestamp	= g_timestamp.now();
 	while(NULL != g_hWndBuoy){
-		PROCEDURE_YIELD();
+	PROCEDURE_YIELD();
 	}
 
 	KillTimer(hWnd, 100);
 	PostQuitMessage(0);
 	PROCEDURE_END();
-*/
+	*/
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -336,6 +335,30 @@ bool	handle_init_app(const char* cfg_file){
 
 				g_shortcuts.push_back(info);
 			}
+		}
+	}
+
+	// instructions
+	{
+		std::string	file	= g_cfg.get_value("config/instruction_file", "");
+		if(file.empty()){
+			return	false;
+		}
+
+		std::ifstream	ifs(file);
+		if(ifs){
+			std::copy(std::istream_iterator<string_line>(ifs),
+				std::istream_iterator<string_line>(),
+				std::back_inserter(g_instructions)
+				);
+		}
+
+		if(g_instructions.empty()){
+			return	false;
+		}
+
+		if(!g_calculator.load_instructions(g_instructions.begin(), g_instructions.size())){
+			return	false;
 		}
 	}
 
