@@ -1,15 +1,21 @@
 @game	=剑雨江湖
 :begin
 
+Wait(2)
+
 # 第一次显示
+:show1
 ShowBuoy(@game)
+GOTO_IF(:show1, NOT(HasBuoy()))
 :loop1
 YIELD()
 GOTO_IF(:loop1, HasBuoy())
 
 # 15分钟后再次显示
 Wait(15 * 60)
+:show2
 ShowBuoy(@game)
+GOTO_IF(:show2, NOT(HasBuoy()))
 :loop2
 YIELD()
 GOTO_IF(:loop2, HasBuoy())

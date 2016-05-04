@@ -36,3 +36,5 @@ Debug
 Release
 ipch
 x64
+
+*.zip
