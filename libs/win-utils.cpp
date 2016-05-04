@@ -32,38 +32,61 @@ bool	win_is_64bits_system(){
 }
 
 //
+//	根据类名获取子窗口，同 FindWindowEx
+//
+HWND	win_find_child_by_class(HWND hWnd, const char* sClass){
+	HWND	hChild	= GetWindow(hWnd, GW_CHILD);
+	if(NULL == hChild){
+		return	hChild;
+	}
+
+	do{
+		char	buf[MAX_PATH]	= {};
+		GetClassName(hChild, buf, sizeof(buf) - 1);
+		if(0 == _strcmpi(buf, sClass)){
+			return	hChild;
+		}
+
+		hChild	= GetWindow(hChild, GW_HWNDNEXT);
+	}while(hChild != NULL);
+
+	return	NULL;
+}
+
+HWND	win_find_desktop_SHELLDLL_DefView(const char* sClass) {
+	HWND	hView	= NULL;
+	HWND	hWnd	= win_find_child_by_class(GetDesktopWindow(), sClass);
+	while(NULL != hWnd)
+	{
+		hView	= win_find_child_by_class(hWnd, "SHELLDLL_DefView");
+		if(NULL != hView){
+			break;
+		}
+
+		do{
+			char	buf[MAX_PATH]	= {};
+			hWnd	= GetWindow(hWnd, GW_HWNDNEXT);
+			GetClassName(hWnd, buf, sizeof(buf) - 1);
+			if(0 == _strcmpi(buf, "WorkerW")){
+				break;
+			}
+		}while(hWnd != NULL);
+	}
+
+	return	hView;
+}
+
+//
 //	获取桌面SysListView窗口句柄
 //
 HWND	win_get_desktop_SysListView(){
-	HWND	xView	= NULL;
-	{
-		//	>=win7
-		HWND	xWnd	= FindWindowEx(0, 0, "WorkerW", NULL);
-		while(NULL != xWnd)
-		{
-			xView	= FindWindowEx(xWnd, 0, "SHELLDLL_DefView", 0);
-			if(NULL != xView){
-				break;
-			}
-			xWnd	= FindWindowEx(0, xWnd, "WorkerW", NULL);
-		}
-	}
-
+	HWND	xView	= win_find_desktop_SHELLDLL_DefView("WorkerW");
 	if(NULL == xView){
-		//	<=win7
-		HWND	xWnd	= FindWindowEx(0, 0, "Progman", NULL);
-		while(NULL != xWnd)
-		{
-			xView	= FindWindowEx(xWnd, 0, "SHELLDLL_DefView", 0);
-			if(NULL != xView){
-				break;
-			}
-			xWnd	= FindWindowEx(0, xWnd, "Progman", NULL);
-		}
+		xView	= win_find_desktop_SHELLDLL_DefView("Progman");
 	}
 
 	if(NULL != xView){
-		xView	=	FindWindowEx(xView, 0, "SysListView32", 0);
+		xView	=	win_find_child_by_class(xView, "SysListView32");
 	}
 
 	return	xView;
