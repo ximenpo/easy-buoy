@@ -1,7 +1,18 @@
 @game	=剑雨江湖
 :begin
+
+# 第一次显示
 ShowBuoy(@game)
-Wait(10)
-HideBuoy()
+:loop1
+YIELD()
+GOTO_IF(:loop1, HasBuoy())
+
+# 15分钟后再次显示
+Wait(15 * 60)
+ShowBuoy(@game)
+:loop2
+YIELD()
+GOTO_IF(:loop2, HasBuoy())
+
 :end
-STOP
+STOP()

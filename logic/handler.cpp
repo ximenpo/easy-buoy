@@ -157,7 +157,9 @@ bool	show_buoy(const char* buoy_name){
 }
 
 void	hide_buoy(){
-	PostMessage(g_hWndBuoy, WM_DESTROY, 0, 0);
+	if(NULL != g_hWndBuoy){
+		PostMessage(g_hWndBuoy, WM_DESTROY, 0, 0);
+	}
 }
 
 bool	has_buoy(){
