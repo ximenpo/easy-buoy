@@ -29,6 +29,7 @@ static	std::string	g_sWndClass;
 
 static	timestamp			g_timestamp;
 static	stringify_data		g_cfg;
+static	std::string			g_searchpath;
 
 struct	ShortcutInfo{
 	std::string	caption;
@@ -108,6 +109,14 @@ bool	show_buoy(const char* buoy_name){
 		g_buoyinfo.rgn_file	= g_cfg.get_value(buoy_name, "rgn",		"");
 		string_tonumbers(g_cfg.get_value(buoy_name, "offset", "0,0"),			g_buoyinfo.offset.cx, g_buoyinfo.offset.cy);
 		string_tonumbers(g_cfg.get_value(buoy_name, "close_rect", "0,0,0,0"),	g_buoyinfo.rc_close.left, g_buoyinfo.rc_close.top, g_buoyinfo.rc_close.right, g_buoyinfo.rc_close.bottom);
+		
+		char	buf[MAX_PATH]	={};
+		if(SearchPath(g_searchpath.c_str(), g_buoyinfo.img_file.c_str(), NULL, sizeof(buf) - 1, buf, NULL)){
+			g_buoyinfo.img_file.assign(buf);
+		}
+		if(SearchPath(g_searchpath.c_str(), g_buoyinfo.rgn_file.c_str(), NULL, sizeof(buf) - 1, buf, NULL)){
+			g_buoyinfo.rgn_file.assign(buf);
+		}
 	}
 
 	if(!win_get_desktop_icon_rect(g_buoyinfo.caption.c_str(), &g_buoyinfo.rc_icon)){
@@ -287,10 +296,34 @@ bool	main_procedure(HWND hWnd){
 //
 //	handle_init_app
 //
-bool	handle_init_app(const char* cfg_file){
-	std::ifstream	ifs((win_get_root_path() + cfg_file));
-	if(!ifs || !stringify_from_ini_stream(g_cfg, ifs)){
+bool	handle_init_app(const char* search_paths, const char* cfg_files){
+	if(NULL == search_paths || NULL == cfg_files) {
 		return	false;
+	}
+
+	{
+		g_searchpath	= search_paths;
+		std::deque<std::string>	cfgs;
+		string_split(cfg_files, ";", std::back_inserter(cfgs));
+
+		bool	cfg_loaded	= false;
+		std::deque<std::string>::const_iterator	it	= cfgs.begin();
+		std::deque<std::string>::const_iterator	it_end	= cfgs.end();
+		for(; it != it_end; ++it){
+			char	buf[MAX_PATH]	={};
+			if(!SearchPath(g_searchpath.c_str(), it->c_str(), NULL, sizeof(buf) - 1, buf, NULL)){
+				continue;
+			}
+
+			std::ifstream	ifs(buf);
+			if(ifs && stringify_from_ini_stream(g_cfg, ifs)){
+				cfg_loaded	= true;
+			}
+		}
+
+		if(!cfg_loaded){
+			return	false;
+		}
 	}
 
 	// respons to the system bits
@@ -299,7 +332,7 @@ bool	handle_init_app(const char* cfg_file){
 		if(win_is_64bits_system()){
 			std::string	sApp	= g_cfg.get_value("config/app_64bits", "");
 			if(!sApp.empty()){
-				ShellExecute(NULL, "open", (win_get_root_path() + sApp).c_str(), NULL, win_get_root_path().c_str(), SW_SHOW);
+				ShellExecute(NULL, "open", (win_get_root_path() + sApp).c_str(), string_format("\"%s\" \"%s\"", search_paths, cfg_files).c_str(), win_get_root_path().c_str(), SW_SHOW);
 			}
 			return	false;
 		}
@@ -308,7 +341,9 @@ bool	handle_init_app(const char* cfg_file){
 
 	//	current dir
 	{
+#if	defined(NDEBUG)
 		SetCurrentDirectory(win_get_root_path().c_str());
+#endif
 	}
 
 	//	shortcuts initialzation
@@ -343,8 +378,16 @@ bool	handle_init_app(const char* cfg_file){
 	// instructions
 	{
 		std::string	file	= g_cfg.get_value("config/instruction_file", "");
-		if(file.empty()){
-			return	false;
+		{
+			if(file.empty()){
+				return	false;
+			}
+
+			char	buf[MAX_PATH]	={};
+			if(!SearchPath(g_searchpath.c_str(), file.c_str(), NULL, sizeof(buf) - 1, buf, NULL)){
+				return	false;
+			}
+			file.assign(buf);
 		}
 
 		std::ifstream	ifs(file);
