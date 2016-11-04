@@ -300,6 +300,13 @@ bool	handle_init_app(const char* search_paths, const char* cfg_files){
 	if(NULL == search_paths || NULL == cfg_files) {
 		return	false;
 	}
+	
+	//	change working dir
+	{
+#if	defined(NDEBUG)
+		SetCurrentDirectory(win_get_root_path().c_str());
+#endif
+	}
 
 	{
 		g_searchpath	= search_paths;
@@ -338,13 +345,6 @@ bool	handle_init_app(const char* search_paths, const char* cfg_files){
 		}
 	}
 #endif
-
-	//	current dir
-	{
-#if	defined(NDEBUG)
-		SetCurrentDirectory(win_get_root_path().c_str());
-#endif
-	}
 
 	//	shortcuts initialzation
 	{
