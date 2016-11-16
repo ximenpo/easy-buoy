@@ -110,8 +110,8 @@ bool	win_get_desktop_icon_rect(const char* psCaption, RECT* pRect){
 	LVITEM	xItem,	*pRemoteItem		= NULL;
 	char	sText[512],	*pRemoteText	= NULL;
 
-	pRemoteItem	= (LVITEM*)	VirtualAllocEx(hProcess, NULL, sizeof(xItem), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-	pRemoteText	= (char*)	VirtualAllocEx(hProcess, NULL, sizeof(sText), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+	pRemoteItem	= (LVITEM*)	VirtualAllocEx(hProcess, NULL, sizeof(xItem) + 1, MEM_COMMIT, PAGE_READWRITE);
+	pRemoteText	= (char*)	VirtualAllocEx(hProcess, NULL, sizeof(sText) + 1, MEM_COMMIT, PAGE_READWRITE);
 
 	bool	bFound	= false;
 	int		nSum	= ListView_GetItemCount(hView);
@@ -139,9 +139,9 @@ bool	win_get_desktop_icon_rect(const char* psCaption, RECT* pRect){
 		}
 	}
 
-	CloseHandle(hProcess);
 	VirtualFreeEx(hProcess, pRemoteItem, 0, MEM_RELEASE);
 	VirtualFreeEx(hProcess, pRemoteText, 0, MEM_RELEASE);
+	CloseHandle(hProcess);
 
 	return	bFound;
 }
