@@ -109,7 +109,7 @@ bool	show_buoy(const char* buoy_name){
 		g_buoyinfo.rgn_file	= g_cfg.get_value(buoy_name, "rgn",		"");
 		string_tonumbers(g_cfg.get_value(buoy_name, "offset", "0,0"),			g_buoyinfo.offset.cx, g_buoyinfo.offset.cy);
 		string_tonumbers(g_cfg.get_value(buoy_name, "close_rect", "0,0,0,0"),	g_buoyinfo.rc_close.left, g_buoyinfo.rc_close.top, g_buoyinfo.rc_close.right, g_buoyinfo.rc_close.bottom);
-		
+
 		char	buf[MAX_PATH]	={};
 		if(SearchPath(g_searchpath.c_str(), g_buoyinfo.img_file.c_str(), NULL, sizeof(buf) - 1, buf, NULL)){
 			g_buoyinfo.img_file.assign(buf);
@@ -225,20 +225,22 @@ bool	main_procedure(HWND hWnd){
 
 	// refresh buoy window
 	if(NULL != g_hWndBuoy){
+		static	double	s_timestamp	= 0;
 		RECT	rc;
-		if(win_get_desktop_icon_rect(g_buoyinfo.caption.c_str(), &rc) && 0 != memcmp(&rc, &g_buoyinfo.rc_icon, sizeof(rc))){
-			g_buoyinfo.rc_icon	= rc;
-			MoveWindow(
-				g_hWndBuoy,
-				g_buoyinfo.rc_icon.right + g_buoyinfo.offset.cx, 
-				g_buoyinfo.rc_icon.top + g_buoyinfo.offset.cy, 
-				g_szBuoy.cx, 
-				g_szBuoy.cy,
-				TRUE
-				);
-		}
-		if(img_is_animation()){
-			InvalidateRect(g_hWndBuoy, NULL, FALSE);
+		if(		g_timestamp.now() - s_timestamp >= 0.5
+			&&	win_get_desktop_icon_rect(g_buoyinfo.caption.c_str(), &rc)
+			&&	0 != memcmp(&rc, &g_buoyinfo.rc_icon, sizeof(rc))
+			){
+				s_timestamp	= g_timestamp.now();
+				g_buoyinfo.rc_icon	= rc;
+				MoveWindow(
+					g_hWndBuoy,
+					g_buoyinfo.rc_icon.right + g_buoyinfo.offset.cx, 
+					g_buoyinfo.rc_icon.top + g_buoyinfo.offset.cy, 
+					g_szBuoy.cx, 
+					g_szBuoy.cy,
+					TRUE
+					);
 		}
 		if(img_is_animation()){
 			InvalidateRect(g_hWndBuoy, NULL, FALSE);
@@ -253,38 +255,6 @@ bool	main_procedure(HWND hWnd){
 	}
 
 	return	!g_machine.is_started();
-	/*
-	static	double		old_g_timestamp;
-
-	PROCEDURE_BEGIN(&g_ctx);
-
-	while(!show_buoy("½£Óê½­ºþ")){
-	PROCEDURE_YIELD();
-	}
-
-	old_g_timestamp	= g_timestamp.now();
-	while(NULL != g_hWndBuoy){
-	PROCEDURE_YIELD();
-	}
-
-	old_g_timestamp	= g_timestamp.now();
-	while(g_timestamp.now() - old_g_timestamp <= 15 * 60){
-	PROCEDURE_YIELD();
-	}
-
-	while(!show_buoy("½£Óê½­ºþ")){
-	PROCEDURE_YIELD();
-	}
-
-	old_g_timestamp	= g_timestamp.now();
-	while(NULL != g_hWndBuoy){
-	PROCEDURE_YIELD();
-	}
-
-	KillTimer(hWnd, 100);
-	PostQuitMessage(0);
-	PROCEDURE_END();
-	*/
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -300,7 +270,7 @@ bool	handle_init_app(const char* search_paths, const char* cfg_files){
 	if(NULL == search_paths || NULL == cfg_files) {
 		return	false;
 	}
-	
+
 	//	change working dir
 	{
 #if	defined(NDEBUG)
