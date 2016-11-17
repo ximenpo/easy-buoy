@@ -223,15 +223,21 @@ bool	main_procedure(HWND hWnd){
 	// handle shortcuts
 	monitor_shotcuts();
 
+	// 非动画则降频使用
+	static	double	s_timestamp_last_update	= 0;
+	if(!img_is_animation()){
+		if (g_timestamp.now() - s_timestamp_last_update < 0.5) {
+			return	false;
+		}
+	}
+
 	// refresh buoy window
 	if(NULL != g_hWndBuoy){
-		static	double	s_timestamp	= 0;
 		RECT	rc;
-		if(		g_timestamp.now() - s_timestamp >= 0.5
+		if(		g_timestamp.now() - s_timestamp_last_update >= 0.5
 			&&	win_get_desktop_icon_rect(g_buoyinfo.caption.c_str(), &rc)
 			&&	0 != memcmp(&rc, &g_buoyinfo.rc_icon, sizeof(rc))
 			){
-				s_timestamp	= g_timestamp.now();
 				g_buoyinfo.rc_icon	= rc;
 				MoveWindow(
 					g_hWndBuoy,
@@ -253,7 +259,8 @@ bool	main_procedure(HWND hWnd){
 	if(!g_machine.is_paused()){
 		g_machine.run(false);
 	}
-
+	
+	s_timestamp_last_update	= g_timestamp.now();
 	return	!g_machine.is_started();
 }
 
