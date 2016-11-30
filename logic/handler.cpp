@@ -407,6 +407,21 @@ void	handle_draw(HWND hWnd, HDC hdc){
 }
 
 //
+//	run shortcuts
+//
+static	bool	internal_run_shortcut(const std::string& link_name, int csidl = CSIDL_DESKTOPDIRECTORY) {
+	char folder[MAX_PATH] = {0};
+	SHGetSpecialFolderPath(0, folder, csidl,	FALSE);
+	std::string	slink	= string_format("%s\\%s.lnk", folder, link_name.c_str());
+	if(::PathFileExistsA(slink.c_str())) {
+		win_run_shortcut(slink.c_str(), win_get_root_path().c_str());
+		return	true;
+	}
+
+	return	false;
+}
+
+//
 //	handle_click
 //
 void	handle_click(HWND hWnd, int x, int y){
@@ -416,16 +431,18 @@ void	handle_click(HWND hWnd, int x, int y){
 
 	POINT	pt	= {x, y};
 	if(!PtInRect(&g_buoyinfo.rc_close, pt)){
+		bool	processed	= false;
 		std::deque<ShortcutInfo>::iterator	it, it_end;
 		for(it = g_shortcuts.begin(), it_end = g_shortcuts.end(); it != it_end; ++it){
 			if(it->caption != g_buoyinfo.caption){
 				continue;
 			}
-			char folder[MAX_PATH] = {0};
-			SHGetSpecialFolderPath(0, folder, it->all_user?CSIDL_COMMON_DESKTOPDIRECTORY:CSIDL_DESKTOPDIRECTORY,	FALSE);
-			std::string	slink	= string_format("%s\\%s.lnk", folder, g_buoyinfo.caption.c_str());
-			win_run_shortcut(slink.c_str(), win_get_root_path().c_str());
+			processed	= internal_run_shortcut(g_buoyinfo.caption, it->all_user?CSIDL_COMMON_DESKTOPDIRECTORY:CSIDL_DESKTOPDIRECTORY);
 			break;
+		}
+
+		if(!processed){
+			internal_run_shortcut(g_buoyinfo.caption, CSIDL_DESKTOPDIRECTORY) || internal_run_shortcut(g_buoyinfo.caption, CSIDL_COMMON_DESKTOPDIRECTORY);
 		}
 	}
 
